@@ -1,43 +1,48 @@
-import React from 'react';
-import './Header.css'
-import { useChecklist } from 'react-checklist';
+import React from 'react'
+import {Switch} from "pretty-checkbox-react";
+import 'pretty-checkbox/src/pretty-checkbox.scss'
 
-const data = [
-    { _id: 1, label: 'item 1' },
-    { _id: 2, label: 'item 2' },
-    { _id: 3, label: 'item 3' },
-]
 
-export default (st) => {
-    const { handleCheck, isCheckedAll, checkedItems } = useChecklist(data, {
-        key: '_id',
-        keyType: 'number',
-    });
-    console.log(checkedItems);      // Set(0) - handling with Set
-    console.log([...checkedItems]); // []     - handling with Array
+/*
+function getCalendar ()  {
+    fetch("http://192.168.178.63:8080/")
+        .then(response => response.json())
+        .then(
+            (response)=>{this.setState({"response":response});},
+            (error)=>{this.setState({"response":error.message});}
+        );
+    console.log(this.state.response)
+}
+
+function Header({calendars}) {
+    const cal = ['lavoro', 'mi sego', 'home'];
+    const calNumber = [...Array(cal.length)];
+
+    const handleChange = event => {
+        if(!calNumber[event.target.id]) {
+            console.log(event.target.value)
+            calNumber[event.target.id] = true;
+        }
+        else {
+            calNumber[event.target.id] = false;
+            console.log("Non " + event.target.value);
+        }
+    };
+
     return (
-        <ul>
-            <li>
-                <input
-                    type="checkbox"
-                    onChange={handleCheck}              // 1
-                    checked={isCheckedAll}              // 2
-                />
-                <label>Check All</label>
-            </li>
+        <>
+            {
+                cal.map((item, index) => {
+                    return(
+                    <Switch key= {index} id={index} value={item} onChange={getCalendar}>
+                        {item}
+                    </Switch>
+                    )
+                })
+            }
+        </>
+    )
+}
 
-            {data.map((v, i) => (
-                <li key={i}>
-                    <input
-                        type="checkbox"
-                        data-key={v._id}                  // 3
-                        onChange={handleCheck}            // 4
-                        checked={checkedItems.has(v._id)} // 5
-                    />
-                    <label>{v.label}</label>
-                </li>
-            ))}
-
-        </ul>
-    );
-};
+export default Header;
+*/
