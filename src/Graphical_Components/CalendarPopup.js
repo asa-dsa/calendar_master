@@ -82,10 +82,11 @@ class Header extends Component{
 
     constructor(props) {
         super(props);
+
         this.state = {
             posts : [],
-            uri:'http://192.168.178.63:8080/'
         }
+        this.uri = 'https://jsonplaceholder.typicode.com/posts';
     }
 
     componentDidMount(){
@@ -93,9 +94,9 @@ class Header extends Component{
     }
 
     callServer() {
-        axios.get(this.state.uri)
+        axios.get(this.uri)
             .then(response => {
-                console.log(response.data)
+                //console.log(response.data)
                 this.setState({posts: response.data});
             })
             .catch(error =>{
@@ -104,25 +105,42 @@ class Header extends Component{
             })
     }
 
+
     render(){
-        //const {posts} = this.state;
-        //if(posts.length)
-          //  console.log(posts)
+        const {posts} = this.state;
+        if(this.state.posts.length){
+            posts.map((post, index) =>{
+                console.log(post.id)
+            })
+        }
         const cal = ['lavoro', 'home'];
         const calNumber = [...Array(cal.length)];
 
-        const handleChange = event => {
-            if(!calNumber[event.target.id]) {
+        const handleChange = event  =>{
+            if(!(calNumber)[event.target.id]) {
+                this.uri= this.uri+(event.target.value.toString())+"-"
+                console.log(this.uri)
                 console.log(event.target.value)
                 calNumber[event.target.id] = true;
-                this.setState({uri: 'https://jsonplaceholder.typicode.com/posts'})
-                this.callServer();
+                //this.callServer();
             }
             else {
                 calNumber[event.target.id] = false;
+                this.uri= this.uri.replace((event.target.value+"-"), "")
+                console.log(this.uri)
                 console.log("Non " + event.target.value);
             }
-        };
+        }
+    //const {posts} = this.state;
+        //if(posts.length)
+          //  console.log(posts)
+
+
+        const handleClick = () =>{
+            console.log(this.uri)
+        }
+
+
         return (
             <>
                 {
@@ -134,10 +152,10 @@ class Header extends Component{
                         )
                     })
                 }
+                <button type={"submit"} onClick={handleClick}>Invia</button>
             </>
         )
     }
 }
-
 
 export default CalendarPopup
