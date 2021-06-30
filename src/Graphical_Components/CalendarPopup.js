@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Calendar} from 'react-big-calendar'
 
 
-import {Switch} from "pretty-checkbox-react";
+import {Checkbox, Switch} from "pretty-checkbox-react";
 import 'pretty-checkbox/src/pretty-checkbox.scss'
 
 
@@ -18,13 +18,15 @@ import axios from "axios";
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalizer = localizer(globalize)
+const default_uri = "http://192.168.188.80:12345"
+let calendar_types = ["/type"]
 
 
 class CalendarPopup extends Component {
 
     constructor(...args) {
         super(...args)
-        this.get_event_uri = 'http://0.0.0.0:12345/'
+        this.get_event_uri = default_uri + "/"
         this.state = {events:[], culture: 'it'}
         this.handler = this.handler.bind(this)
     }
@@ -35,7 +37,7 @@ class CalendarPopup extends Component {
 
     connectToServer() {
         this.setState({events:[]})
-        console.log("Connecting to server at this uri:" + this.get_event_uri)
+        //console.log("Connecting to server at this uri:" + this.get_event_uri)
         axios.get(this.get_event_uri)
             .then(response => {
                 //.log(response.data)
@@ -48,10 +50,11 @@ class CalendarPopup extends Component {
     }
 
     handler = (val) => {
-        this.get_event_uri = this.get_event_uri + "type=" +val
+        console.log(val)
+        this.get_event_uri = calendar_types.toString()
         this.connectToServer();
-        console.log("Hey, I'm the handler")
-        console.log(this.get_event_uri)
+       // console.log("Hey, I'm the handler")
+        //console.log(this.get_event_uri)
     }
 
 
@@ -117,11 +120,11 @@ class Header extends Component{
 
     constructor(props) {
         super(props);
-
         this.state = {
             posts : [],
+            params: [],
         }
-        this.get_calendar_names_uri = 'http://0.0.0.0:12345/cal';
+        this.get_calendar_names_uri = default_uri + "/cal";
 
     }
 
@@ -143,6 +146,8 @@ class Header extends Component{
 
 
     render(){
+        //console.log(this.state.params)
+
         let cal = [], toSend= [];
         const {posts} = this.state;
         if(this.state.posts.length){
@@ -150,42 +155,38 @@ class Header extends Component{
                 cal[index] = post.Type
             })
         }
-        const calNumber = [...Array(cal.length)];
-        for (var i=0; i< calNumber.length; i++)
-            calNumber[i]=false
 
-        const handleChange = event  =>{
-
-            if(!(calNumber)[event.target.id]) {
-                this.get_calendar_names_uri= this.get_calendar_names_uri+(event.target.value.toString())+"-"
+        const handleChange = (event) =>{
+            if(!(this.state.params.find(element => element === event.target.value.toString()))) {
+                //this.get_calendar_names_uri= this.get_calendar_names_uri+(event.target.value.toString())+"-"
                // console.log(this.uri)
-               // console.log(event.target.value)
-                calNumber[event.target.id] = true;
+               // this.params[event.target.id] = event.target.value.toString();
+                //console.log(event.target.value.toString())
 
-                //this.callServer();
+                this.setState(state => ({
+                    params : [...state.params, event.target.value.toString()]
+                }))
+
             }
             else {
-                calNumber[event.target.id] = false;
-                this.get_calendar_names_uri= this.get_calendar_names_uri.replace((event.target.value+"-"), "")
+                let temp = [], j=0
+                for(let i=0; i<this.state.params.length; i++)
+                    if(!(this.state.params[i] === event.target.value.toString()))
+                        temp[j++]= this.state.params[i]
+                this.setState(state => ({
+                    params : temp
+                }))
+                //this.props.handler(this.state.params)
 
-                //console.log(this.uri)
-                //console.log("Non " + event.target.value);
             }
+        }
+
+        const handleSend = () => {
+            this.props.handler(this.state.params)
         }
     //const {posts} = this.state;
         //if(posts.length)
           //  console.log(posts)
-
-
-
-        const handleClick = () =>{
-            var toSend = []
-            let j = 0;
-            for(var i=0; i<calNumber.length; i++)
-                if(calNumber[i])
-                    toSend[j++] = cal[i]
-            this.props.handler(toSend)
-        }
 
 
         return (
@@ -199,7 +200,7 @@ class Header extends Component{
                         )
                     })
                 }
-                <button type={"submit"} onClick={handleClick}>Invia</button>
+                <input type="submit" value="Invio" onClick={handleSend} />
             </>
         )
     }
