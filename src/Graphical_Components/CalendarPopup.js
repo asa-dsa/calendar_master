@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Calendar} from 'react-big-calendar'
 
 
-import {Checkbox, Switch} from "pretty-checkbox-react";
+import {Switch} from "pretty-checkbox-react";
 import 'pretty-checkbox/src/pretty-checkbox.scss'
 
 
@@ -19,7 +19,8 @@ import axios from "axios";
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalizer = localizer(globalize)
 const default_uri = "http://192.168.188.80:12345"
-let calendar_types = ["/type"]
+let calendar_types = ["/list_cal_event?type"]
+
 
 
 class CalendarPopup extends Component {
@@ -28,6 +29,7 @@ class CalendarPopup extends Component {
         super(...args)
         this.get_event_uri = default_uri + "/"
         this.state = {events:[], culture: 'it'}
+        this.test = []
         this.handler = this.handler.bind(this)
     }
 
@@ -38,6 +40,7 @@ class CalendarPopup extends Component {
     connectToServer() {
         this.setState({events:[]})
         //console.log("Connecting to server at this uri:" + this.get_event_uri)
+        console.log(this.get_event_uri)
         axios.get(this.get_event_uri)
             .then(response => {
                 //.log(response.data)
@@ -50,8 +53,8 @@ class CalendarPopup extends Component {
     }
 
     handler = (val) => {
-        console.log(val)
-        this.get_event_uri = calendar_types.toString()
+        console.log(calendar_types.toString() + "=" + val.toString())
+        this.get_event_uri = default_uri + calendar_types.toString() + "=" + val.toString()
         this.connectToServer();
        // console.log("Hey, I'm the handler")
         //console.log(this.get_event_uri)
@@ -83,11 +86,11 @@ class CalendarPopup extends Component {
     }
 
     render(){
-
         const {events} = this.state;
         if(this.state.events.length){
             events.map((event, index) =>{
-                console.log(event)
+                this.state.events[index].start = new Date(1000*parseFloat(event.start))
+                this.state.events[index].end = new Date(1000*parseFloat(event.end))
             })
         }
         return(
@@ -146,9 +149,8 @@ class Header extends Component{
 
 
     render(){
-        //console.log(this.state.params)
 
-        let cal = [], toSend= [];
+        let cal = []
         const {posts} = this.state;
         if(this.state.posts.length){
             posts.map((post, index) =>{
@@ -158,15 +160,9 @@ class Header extends Component{
 
         const handleChange = (event) =>{
             if(!(this.state.params.find(element => element === event.target.value.toString()))) {
-                //this.get_calendar_names_uri= this.get_calendar_names_uri+(event.target.value.toString())+"-"
-               // console.log(this.uri)
-               // this.params[event.target.id] = event.target.value.toString();
-                //console.log(event.target.value.toString())
-
                 this.setState(state => ({
                     params : [...state.params, event.target.value.toString()]
                 }))
-
             }
             else {
                 let temp = [], j=0
@@ -176,7 +172,6 @@ class Header extends Component{
                 this.setState(state => ({
                     params : temp
                 }))
-                //this.props.handler(this.state.params)
 
             }
         }
@@ -184,9 +179,6 @@ class Header extends Component{
         const handleSend = () => {
             this.props.handler(this.state.params)
         }
-    //const {posts} = this.state;
-        //if(posts.length)
-          //  console.log(posts)
 
 
         return (
