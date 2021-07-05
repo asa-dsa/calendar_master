@@ -19,7 +19,8 @@ import axios from "axios";
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalizer = localizer(globalize)
 const default_uri = "http://192.168.188.80:12345"
-let calendar_types = ["/list_cal_event?type"]
+const calendar_multiple_types = ["/list_cal_event_multiple?type"]
+const calendar_single_type = ["/list_cal_event?type"]
 
 
 
@@ -53,8 +54,10 @@ class CalendarPopup extends Component {
     }
 
     handler = (val) => {
-        console.log(calendar_types.toString() + "=" + val.toString())
-        this.get_event_uri = default_uri + calendar_types.toString() + "=" + val.toString()
+        if((val.toString()).search(',') <0)
+            this.get_event_uri = default_uri + calendar_single_type.toString() + "=" + val.toString()
+        else
+            this.get_event_uri = default_uri + calendar_multiple_types.toString() + "=" + val.toString()
         this.connectToServer();
        // console.log("Hey, I'm the handler")
         //console.log(this.get_event_uri)
@@ -80,17 +83,18 @@ class CalendarPopup extends Component {
             })*/
     }
 
-    backgroundColor = (calendarName) => {
+    /*backgroundColor = (calendarName) => {
         var randomColor = Math.floor(Math.random() * 16777215).toString(16);
         return '#' + randomColor;
     }
-
+*/
     render(){
         const {events} = this.state;
         if(this.state.events.length){
             events.map((event, index) =>{
                 this.state.events[index].start = new Date(1000*parseFloat(event.start))
                 this.state.events[index].end = new Date(1000*parseFloat(event.end))
+                this.state.events[index].allDay = (event.allDay === 'true')
             })
         }
         return(
@@ -105,12 +109,12 @@ class CalendarPopup extends Component {
                     events={this.state.events}
                     localizer={globalizeLocalizer}
                     defaultDate={new Date()}
-                    onSelectEvent={event => alert(event.calendar)}
+                    onSelectEvent={event => alert(event.type)}
                     onSelectSlot={this.handleSelect}
                     style={{height: "100vh"}}
                     eventPropGetter={event => {
                         return {
-                            style: {backgroundColor: this.backgroundColor(event.calendar)}
+                            style: {backgroundColor: event.color}
                         }
                     }}
                 />
