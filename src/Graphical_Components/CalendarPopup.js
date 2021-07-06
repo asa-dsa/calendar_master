@@ -14,14 +14,15 @@ import 'react-big-calendar/lib/sass/styles.scss'
 import localizer from "react-big-calendar/lib/localizers/globalize";
 import globalize from "globalize";
 import axios from "axios";
-
+import FormComponent from './FormComponent.js'
+import NewWindow from "react-new-window";
+import * as ReactDOM from "react-dom";
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalizer = localizer(globalize)
-const default_uri = "http://192.168.188.80:12345"
+const default_uri = "http://192.168.188.79:12345"
 const calendar_multiple_types = ["/list_cal_event_multiple?type"]
 const calendar_single_type = ["/list_cal_event?type"]
-
 
 
 class CalendarPopup extends Component {
@@ -29,7 +30,7 @@ class CalendarPopup extends Component {
     constructor(...args) {
         super(...args)
         this.get_event_uri = default_uri + "/"
-        this.state = {events:[], culture: 'it'}
+        this.state = {events:[], culture: 'it', views: true}
         this.test = []
         this.handler = this.handler.bind(this)
     }
@@ -37,6 +38,7 @@ class CalendarPopup extends Component {
     componentDidMount(){
         this.connectToServer();
     }
+
 
     connectToServer() {
         this.setState({events:[]})
@@ -63,9 +65,10 @@ class CalendarPopup extends Component {
         //console.log(this.get_event_uri)
     }
 
-
-
     handleSelect = ({start, end}) => {
+        alert(start + end)
+        this.setState({views: false})
+
        // this.setState('url')
         /*const title = window.prompt('New Event name')
         const calendar = window.prompt('Event from this Calendar:')
@@ -81,6 +84,10 @@ class CalendarPopup extends Component {
                     },
                 ],
             })*/
+    }
+
+    handleTest = () => {
+        this.setState({views: true})
     }
 
     /*backgroundColor = (calendarName) => {
@@ -99,9 +106,15 @@ class CalendarPopup extends Component {
         }
         return(
             <React.Fragment>
-               <div>
-                <Header handler={this.handler}/>
-               </div>
+                {(!this.state.views)?
+                    <div>
+                    <Switch key= {1} id={2} value={1} onChange={this.handleTest}>
+                        CIAOOO
+                    </Switch>
+                </div>
+                :
+                <div>
+                    <Header handler={this.handler}/>
                    <Calendar
                     popup
                     selectable
@@ -117,11 +130,15 @@ class CalendarPopup extends Component {
                             style: {backgroundColor: event.color}
                         }
                     }}
-                />
+                   />
+                </div>
+                }
             </React.Fragment>
         )
     }
+
 }
+
 
 class Header extends Component{
 
