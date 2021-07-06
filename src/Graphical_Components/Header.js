@@ -1,48 +1,86 @@
-import React from 'react'
+import React, {Component} from "react";
+import axios from "axios";
 import {Switch} from "pretty-checkbox-react";
-import 'pretty-checkbox/src/pretty-checkbox.scss'
+
+const getAllCal_uri = "/cal"
 
 
-/*
-function getCalendar ()  {
-    fetch("http://192.168.178.63:8080/")
-        .then(response => response.json())
-        .then(
-            (response)=>{this.setState({"response":response});},
-            (error)=>{this.setState({"response":error.message});}
-        );
-    console.log(this.state.response)
-}
+class Header extends Component{
 
-function Header({calendars}) {
-    const cal = ['lavoro', 'mi sego', 'home'];
-    const calNumber = [...Array(cal.length)];
-
-    const handleChange = event => {
-        if(!calNumber[event.target.id]) {
-            console.log(event.target.value)
-            calNumber[event.target.id] = true;
+    constructor(props) {
+        super(props);
+        this.state = {
+            posts : [],
+            params: [],
         }
-        else {
-            calNumber[event.target.id] = false;
-            console.log("Non " + event.target.value);
-        }
-    };
+        this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
 
-    return (
-        <>
-            {
-                cal.map((item, index) => {
-                    return(
-                    <Switch key= {index} id={index} value={item} onChange={getCalendar}>
-                        {item}
-                    </Switch>
-                    )
-                })
+    }
+
+    componentDidMount(){
+        this.callServer();
+    }
+
+    callServer() {
+        axios.get(this.get_calendar_names_uri)
+            .then(response => {
+                //console.log(response.data)
+                this.setState({posts: response.data});
+            })
+            .catch(error =>{
+                console.log(error);
+                this.setState({error: 'Error'});
+            })
+    }
+
+
+    render(){
+
+        let cal = []
+        const {posts} = this.state;
+        if(this.state.posts.length){
+            posts.map((post, index) =>{
+                cal[index] = post.Type
+            })
+        }
+
+        const handleChange = (event) =>{
+            if(!(this.state.params.find(element => element === event.target.value.toString()))) {
+                this.setState(state => ({
+                    params : [...state.params, event.target.value.toString()]
+                }))
             }
-        </>
-    )
-}
+            else {
+                let temp = [], j=0
+                for(let i=0; i<this.state.params.length; i++)
+                    if(!(this.state.params[i] === event.target.value.toString()))
+                        temp[j++]= this.state.params[i]
+                this.setState(() => ({
+                    params : temp
+                }))
 
-export default Header;
-*/
+            }
+        }
+
+        const handleSend = () => {
+            this.props.handler(this.state.params)
+        }
+
+
+        return (
+            <>
+                {
+                    cal.map((item, index) => {
+                        return(
+                            <Switch key= {index} id={index} value={item} onChange={handleChange}>
+                                {item}
+                            </Switch>
+                        )
+                    })
+                }
+                <input type="submit" value="Invio" onClick={handleSend} />
+            </>
+        )
+    }
+}
+export default Header
