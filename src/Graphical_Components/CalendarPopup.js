@@ -13,7 +13,7 @@ import local from "react-big-calendar/lib/localizers/globalize";
 import globalize from "globalize";
 import axios from "axios";
 
-import Form from "./Form";
+import FormClass from "./Form_Folder/FormClass";
 import Header from "./Header"
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
@@ -108,7 +108,7 @@ class CalendarPopup extends Component {
             <React.Fragment>
                 {(!this.state.views)?
                     <div>
-                        <Form handlerViews={this.handlerViews} start={this.state.startTime} end={this.state.endTime} uri={default_uri}/>
+                        <FormClass handlerViews={this.handlerViews} start={this.state.startTime} end={this.state.endTime} uri={default_uri}/>
                     </div>
                 :
                 <div>
