@@ -34,7 +34,8 @@ class CalendarPopup extends Component {
             culture: 'it',
             views: true,
             startTime: 0,
-            endTime: 0
+            endTime: 0,
+            user: "UserTest"
         }
 
         this.handler = this.handler.bind(this)
@@ -112,7 +113,7 @@ class CalendarPopup extends Component {
                     </div>
                 :
                 <div>
-                    <Header handler={this.handler} uri={default_uri}/>
+                    <Header handler={this.handler} uri={default_uri} owner={this.state.user}/>
                    <Calendar
                     popup
                     selectable
