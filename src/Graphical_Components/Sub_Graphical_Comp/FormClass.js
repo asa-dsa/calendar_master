@@ -8,14 +8,19 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
 const oneDayMs = 86400 * 1000
+const maxProps = 5
 const getAllCal_uri = "/cal"
 
+
+
+let showProp = new Array(maxProps);
+let lastInserted = 0
 
 class FormClass extends Component{
 
 
     /*
-    calendario, tipo, attr
+    calendario, tipo
      */
     constructor(props) {
         super(props);
@@ -27,22 +32,26 @@ class FormClass extends Component{
             tipo:"",
             startTime: this.props.start,
             endTime: this.props.end,
-            posts:[],
+            calendar_names:[],
             newCal: false
         }
+        this.prop_temp = ""
+        this.value_temp = ""
         this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
-
+        for (let i=0; i<maxProps; i++)
+            showProp[i] = false
+        lastInserted = 0
     }
 
     componentDidMount(){
-        this.callServer();
+        this.getCalNamesFromServer();
     }
 
-    callServer() {
+    getCalNamesFromServer() {
         axios.get(this.get_calendar_names_uri)
             .then(response => {
                 //console.log(response.data)
-                this.setState({posts: response.data})
+                this.setState({calendar_names: response.data})
             })
             .catch(error =>{
                 console.log(error);
@@ -52,13 +61,12 @@ class FormClass extends Component{
 
     render() {
         let cal = []
-        const {posts} = this.state;
-        if(this.state.posts.length){
-            posts.map((post, index) =>{
+        const {calendar_names} = this.state;
+        if(this.state.calendar_names.length){
+            calendar_names.map((post, index) =>{
                 cal[index] = post.Type
             })
         }
-
 
         //use when send a message to return back to the calendar
         const handleSend = () => {
@@ -103,15 +111,28 @@ class FormClass extends Component{
             handleSend()
         }
 
-        const updateDetails = (e) => {
-            this.setState({dettagli: (e.target.value).toUpperCase()})
-        }
 
         const handleColorChange = ({ hex }) => {
             this.setState({colore: hex})
         }
 
-        let timezone_off = (new Date()).getTimezoneOffset() * 60000;//offset in milliseconds
+        const handleProp = (e) => {
+            this.prop_temp = e.target.value
+
+        }
+
+        const handleValue = (e) => {
+            this.value_temp = e.target.value
+
+        }
+
+
+        const handlePropAdding = () =>{
+            showProp[lastInserted++] = true
+            this.setState({[this.prop_temp]:this.value_temp})
+        }
+
+        let timezone_off = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
 
         return (
                 <div align="center">
@@ -191,19 +212,63 @@ class FormClass extends Component{
                     />
                     </p>
 
+
                     <p>
-                    <TextField
-                        id="standard-multiline-static"
-                        label="Ulteriori dettagli dell'evento"
-                        multiline
-                        rows={4}
-                        defaultValue=""
-                        onChange={updateDetails}
-                    />
+                    <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[0]}/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[0]}/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
                     </p>
+
+                    {(lastInserted>0)?
+                    <p>
+                        <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[1]}/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[1]}/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
+                    </p>
+                        :<p></p>
+                    }
+
+                    {(lastInserted>1)?
+                    <p>
+                        <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[2]}/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[2]}/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
+                    </p>
+                        :<p></p>
+                    }
+
+                    {(lastInserted>2)?
+
+                        <p>
+                            <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[3]}/>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[3]}/>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
+                        </p>
+                    :<p></p>
+                    }
+
+                    {(lastInserted>3)?
+                        <p>
+                            <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[4]}/>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[4]}/>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
+                        </p>
+                    :<p></p>
+                    }
+
+
                     <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
                     <p><Button variant="contained" onClick={onSend}>Aggiungi evento</Button></p>
-
                 </div>
         );
     }

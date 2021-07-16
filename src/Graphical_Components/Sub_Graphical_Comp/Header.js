@@ -66,6 +66,18 @@ class Header extends Component{
             this.props.handler(this.state.params)
         }
 
+        const handleAddCal = () => {
+           let calendarName = prompt("Nome del calendario")
+            console.log(calendarName)
+            console.log(this.props.owner)
+        }
+
+        const handleAddPre= () => {
+        }
+
+        const handleAddAut = () => {
+        }
+
 
         return (
             <>
@@ -78,7 +90,16 @@ class Header extends Component{
                         )
                     })
                 }
-                <input type="submit" value="Invio" onClick={handleSend} />
+                <input type="submit" value="Aggiorna la vista" onClick={handleSend} />
+                {(this.props.owner === "UserTest")?
+                    <p align="center">
+                        <input type="submit" value="Aggiungi un calendario" onClick={handleAddCal} />
+                        <input type="submit" value="Aggiungi precondizione temporale" onClick={handleAddPre} />
+                        <input type="submit" value="Aggiungi autorizzazione" onClick={handleAddAut} />
+                    </p>
+                    :
+                    <p></p>
+                }
             </>
         )
     }

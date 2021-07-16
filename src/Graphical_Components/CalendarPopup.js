@@ -13,8 +13,8 @@ import local from "react-big-calendar/lib/localizers/globalize";
 import globalize from "globalize";
 import axios from "axios";
 
-import FormClass from "./Form_Folder/FormClass";
-import Header from "./Header"
+import FormClass from "./Sub_Graphical_Comp/FormClass";
+import Header from "./Sub_Graphical_Comp/Header"
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
@@ -74,7 +74,7 @@ class CalendarPopup extends Component {
     }
 
     handleSelect = ({start, end}) => {
-        alert(start + end)
+        alert("Intervallo orario selezionato: \n" + start + "\n" + end)
         this.setState({startTime:start, endTime:end})
         this.setState({views: false})
 
