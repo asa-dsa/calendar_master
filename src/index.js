@@ -1,13 +1,3 @@
-/*import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './Graphical_Components/CalendarPopup';
-import registerServiceWorker from './registerServiceWorker';
-
-ReactDOM.render(<App />, document.getElementById('root'));
-registerServiceWorker();
-*/
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';

@@ -94,8 +94,14 @@ class Header extends Component{
                 {(this.props.owner === "UserTest")?
                     <p align="center">
                         <input type="submit" value="Aggiungi un calendario" onClick={handleAddCal} />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
                         <input type="submit" value="Aggiungi precondizione temporale" onClick={handleAddPre} />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
                         <input type="submit" value="Aggiungi autorizzazione" onClick={handleAddAut} />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
                     </p>
                     :
                     <p></p>

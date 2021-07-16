@@ -23,7 +23,7 @@ const default_uri = "http://192.168.188.79:12345"
 const calendar_multiple_types = ["/list_cal_event_multiple?type"]
 const calendar_single_type = ["/list_cal_event?type"]
 
-
+//doc: https://jquense.github.io/react-big-calendar/examples/index.html
 class CalendarPopup extends Component {
 
     constructor(...args) {
@@ -118,10 +118,14 @@ class CalendarPopup extends Component {
                     popup
                     selectable
                     culture={this.state.culture}
+                    messages={{'today': "Oggi", "previous":'Precedente', "next":"Successivo",
+                        "month":"Mese", "week":"Settimana", "day":"Giorno", "agenda": "Agenda Giornaliera",
+                        noEventsInRange: 'Non ci sono eventi nella giornata corrente.'}}
                     events={this.state.events}
                     localizer={globalizeLocalize}
                     defaultDate={new Date()}
-                    onSelectEvent={event => alert(event.type)}
+                    onSelectEvent={event => alert("Elenco props. evento")}
+                    onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
                     onSelectSlot={this.handleSelect}
                     style={{height: "100vh"}}
                     eventPropGetter={event => {
