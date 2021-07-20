@@ -56,8 +56,8 @@ class CalendarPopup extends Component {
         console.log(this.get_event_uri)
         axios.get(this.get_event_uri)
             .then(response => {
-                //.log(response.data)
                 this.setState({events: response.data});
+
             })
             .catch(error =>{
                 console.log(error);
@@ -96,16 +96,28 @@ class CalendarPopup extends Component {
     }
 
 
+    //9 elements; from the 9-th element, they are all extra props (to 5 - max limit)
+    handleClickedEvent  = (e) => {
+        alert("Elenco props. evento")
+        console.log(Object.keys(e))
+        //send to the visualizer class the e event
+        //the visualizer class must count the prop
+        //if |props| == 9, shows only essential data
+        //otherwise, add n*2 text area to show the extra props
+    }
+
+
 
     render(){
-        const {events} = this.state;
+        const copy = this.state.events.map(item => ({...item}))
         if(this.state.events.length){
-            events.map((event, index) =>{
-                this.state.events[index].start = new Date(1000*parseFloat(event.start))
-                this.state.events[index].end = new Date(1000*parseFloat(event.end))
-                this.state.events[index].allDay = (event.allDay === 'true')
+            copy.map((event, index) =>{
+                copy[index].start = new Date(1000*parseFloat(event.start))
+                copy[index].end = new Date(1000*parseFloat(event.end))
+                copy[index].allDay = (event.allDay === 'true')
             })
         }
+
 
         return(
             <React.Fragment>
@@ -116,7 +128,6 @@ class CalendarPopup extends Component {
                 :
                 <div>
                     <Header handler={this.handler} uri={default_uri} owner={this.state.user}/>
-
                     <Calendar
                     popup
                     selectable
@@ -124,11 +135,11 @@ class CalendarPopup extends Component {
                     messages={{'today': "Oggi", "previous":'Precedente', "next":"Successivo",
                         "month":"Mese", "week":"Settimana", "day":"Giorno", "agenda": "Agenda Giornaliera",
                         noEventsInRange: 'Non ci sono eventi nella giornata corrente.'}}
-                    events={this.state.events}
+                    events={copy}
                     localizer={globalizeLocalize}
                     defaultDate={new Date()}
                     defaultView={"week"}
-                    onSelectEvent={event => alert("Elenco props. evento")}
+                    onSelectEvent={this.handleClickedEvent}
                     onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
                     onSelectSlot={this.handleSelect}
                     style={{height: "100vh"}}
