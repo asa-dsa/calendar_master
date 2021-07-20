@@ -1,20 +1,57 @@
 import React from "react";
-import CalendarPopup from "./Graphical_Components/CalendarPopup";
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import CalendarPopup from "./Calendar_Components/CalendarPopup";
+import Login from "./Auth_Components/Login"
+import Register from "./Auth_Components/Register"
+import Change from "./Auth_Components/ChangePwd"
 
-function App() {
-    return (
-        <div className="App">
-            <h2> <center>Calendario AM - SS</center></h2>
-            <BrowserRouter>
-                <Switch>
-                    <Route path="/calendar">
-                        <CalendarPopup />
+import { BrowserRouter, Route, Redirect} from 'react-router-dom';
+
+export class App extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            authenticated: !(localStorage.getItem('token') === null)
+        }
+        this.handleUpdate = this.handleUpdate.bind(this)
+    }
+
+    handleUpdate = (data) =>{
+        this.setState({authenticated: true})
+        this.setState({user: data})
+    }
+
+    handleLogOut = () =>  {
+        localStorage.removeItem('token');
+        window.location.reload();
+    }
+
+    render() {
+        console.log(localStorage.getItem("token"))
+        return (
+            <div className="App">
+                <h2>
+                    <center>Calendario AM - SS</center>
+                    <button type="submit" className="btn btn-primary btn-block" onClick={this.handleLogOut}>Log out</button>
+                </h2>
+                <BrowserRouter>
+                    <Route exact path="/">
+                        {this.state.authenticated ?
+                            <CalendarPopup auth={this.state.authenticated}/>
+                            :
+                            <Redirect to="/login" />
+                        }
                     </Route>
-                </Switch>
-            </BrowserRouter>
-        </div>
-    );
-}
 
+                    <Route exact path="/login" render={() => (
+                        <Login
+                            auth={this.handleUpdate}
+                            />
+                        )}/>
+                </BrowserRouter>
+
+            </div>
+        )
+    }
+}
 export default App;

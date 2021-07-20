@@ -13,8 +13,8 @@ import local from "react-big-calendar/lib/localizers/globalize";
 import globalize from "globalize";
 import axios from "axios";
 
-import FormClass from "./Sub_Graphical_Comp/FormClass";
-import Header from "./Sub_Graphical_Comp/Header"
+import FormClass from "./Graphical_Comp/FormClass";
+import Header from "./Graphical_Comp/Header"
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
@@ -95,6 +95,8 @@ class CalendarPopup extends Component {
             })*/
     }
 
+
+
     render(){
         const {events} = this.state;
         if(this.state.events.length){
@@ -114,7 +116,8 @@ class CalendarPopup extends Component {
                 :
                 <div>
                     <Header handler={this.handler} uri={default_uri} owner={this.state.user}/>
-                   <Calendar
+
+                    <Calendar
                     popup
                     selectable
                     culture={this.state.culture}
@@ -124,6 +127,7 @@ class CalendarPopup extends Component {
                     events={this.state.events}
                     localizer={globalizeLocalize}
                     defaultDate={new Date()}
+                    defaultView={"week"}
                     onSelectEvent={event => alert("Elenco props. evento")}
                     onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
                     onSelectSlot={this.handleSelect}

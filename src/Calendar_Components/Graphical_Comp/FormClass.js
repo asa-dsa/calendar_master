@@ -26,7 +26,7 @@ class FormClass extends Component{
         super(props);
         this.state = {
             title: "",
-            allDay: ((this.props.end - this.props.start) === oneDayMs),
+            allDay: false,
             calendario: "",
             colore: "",
             tipo:"",
@@ -75,12 +75,20 @@ class FormClass extends Component{
 
         const updateStartDate = (e) => {
             this.setState({startTime: new Date(e.target.value)})
-
         }
 
 
         const updateEndDate = (e) => {
-            this.setState({endTime: new Date(e.target.value)})
+            let endDate = new Date(e.target.value)
+            if(endDate-this.state.startTime >= oneDayMs || endDate <= this.state.startTime) {
+                const tempTime = new Date(this.state.startTime);
+                tempTime.setHours(23);
+                tempTime.setMinutes(59)
+                this.setState({endTime: tempTime})
+                this.setState({error: true})
+            }
+            else
+                this.setState({endTime: endDate})
 
         }
 
@@ -104,6 +112,8 @@ class FormClass extends Component{
 
         const onSend =() => {
             console.log(this.state)
+            if(this.state.error)
+                alert("Errore nell'inserimento della data di fine evento; data di fine evento impostata a " + this.state.endTime)
             handleSend()
         }
 
@@ -211,7 +221,6 @@ class FormClass extends Component{
                         inputProps={{ 'aria-label': 'secondary checkbox' }}
                     />
                     </p>
-
 
                     <p>
                     <TextField id="standard-basic" label="Proprietà" onChange={handleProp} disabled={showProp[0]}/>
