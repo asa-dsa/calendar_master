@@ -270,7 +270,7 @@ class FormClass extends Component{
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <TextField id="filled-basic" label="Valore" variant="filled" onChange={handleValue} disabled={showProp[4]}/>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding}>Aggiungi</Button>
+                            <Button variant="outlined" size="medium" color="primary" onClick={handlePropAdding} disabled={true}>Aggiungi</Button>
                         </p>
                     :<p></p>
                     }

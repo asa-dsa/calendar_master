@@ -8,10 +8,9 @@ export class Login extends React.Component {
         super(props);
         this.state ={
             redirect_pwd : false,
-            authenticated: false
+            authenticated: false,
+            register: false
         }
-        this.props.auth("logged")
-
     }
 
 
@@ -22,11 +21,12 @@ export class Login extends React.Component {
             const username = this.state.name
             const password = this.state.pwd
 
-            const result = await fetch('http://192.168.188.77:9999/api/login', {
+            const result = await fetch(this.props.uri + '/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+
                 body: JSON.stringify({
                 username, password
                 })
@@ -48,7 +48,10 @@ export class Login extends React.Component {
 
         const handleReset = () => {
             this.setState({redirect_pwd: true})
+        }
 
+        const handleRegister = () =>{
+            this.setState({register: true})
         }
 
         const setPwd = (e) => {
@@ -82,14 +85,18 @@ export class Login extends React.Component {
                         <p>
                         <button type="submit" className="btn btn-primary btn-block" onClick={handleSend}>Accedi</button>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <button type="submit" className="btn btn-primary btn-block">Registrati</button>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {(this.state.register) ?
+                            <Redirect to="/register" />
+                            :
+                            <button type="submit" className="btn btn-primary btn-block" onClick={handleRegister}>Registrati</button>
+                        }                        &nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
                         {(this.state.redirect) ?
                             <Redirect to="/changepwd" />
                         :
                             <p><button type="submit" className="btn btn-primary btn-block" onClick={handleReset}>Password dimenticata?</button></p>
                         }
+
                     </form>
                 }
             </div>

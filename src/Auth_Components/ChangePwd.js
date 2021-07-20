@@ -7,7 +7,6 @@ export class ChangePwd extends React.Component {
     constructor(props) {
         super(props);
         this.state ={
-            error: false,
             redirect: false
         }
     }
@@ -16,54 +15,68 @@ export class ChangePwd extends React.Component {
 
     render() {
 
-        const updatepwd = (e) => {
+        const setPwd = (e) => {
             this.setState({pwd: e.target.value})
         }
 
-        const reupdatepwd = (e) => {
-            this.setState({other_pwd: e.target.value})
+        const setDoublePwd = (e) => {
+            this.setState({temp_pwd: e.target.value})
         }
 
-        const onSend = () =>{
-
-            if(this.state.other_pwd !== this.state.pwd) {
+        const onSend = async () => {
+            if (this.state.temp_pwd !== this.state.pwd) {
                 alert("Password non corrispondenti")
-                this.setState({error: true})
+            } else {
+                const password = this.state.pwd
+
+                const result = await fetch('http://192.168.188.77:9999/api/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        newpassword: password,
+                        token: localStorage.getItem('token')
+                    })
+                }).then((res) => res.json())
+
+                if (result.status === 'ok') {
+                    // everythign went fine
+                    alert('Success')
+                    localStorage.removeItem('token')
+                } else {
+                    alert(result.error)
+                }
+
+
+
             }
+
         }
 
-        const handleReset = () => {
-            this.setState({redirect: true})
-        }
 
         return(
             <div style={{width:"500px", justifyContent:"center", textAlign:"center"}}>
                 <form>
-                    <h3>Cambio Password</h3>
+                    <h3>Registrazione</h3>
+
 
                     <div className="form-group">
-                        <label>Indirizzo mail</label>
-                        <input type="email" className="form-control" placeholder="Inserisci indirizzo email" />
+                        <label>Password</label>
+                        <input type="password" className="form-control" placeholder="Inserisci la password" onChange={setPwd}/>
                     </div>
 
                     <div className="form-group">
                         <label>Password</label>
-                        <input type="password" className="form-control" placeholder="Inserisci la password" onChange={updatepwd}/>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" className="form-control" placeholder="Re-inserisci la password" onChange={reupdatepwd}/>
+                        <input type="password" className="form-control" placeholder="Re-inserisci la password" onChange={setDoublePwd}/>
                     </div>
 
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <p>
-                        <button type="submit" className="btn btn-primary btn-block" onClick={onSend}>Cambia la password</button>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                    </p>
-                    {(this.state.redirect) ? <Redirect to="/login" />
+                    {(this.state.redirect) ?
+                        <Redirect to="/login" />
                         :
-                        <p><button type="submit" className="btn btn-primary btn-block" onClick={handleReset}>Torna al login</button></p>
+                        <p><button type="submit" className="btn btn-primary btn-block" onClick={onSend}>Cambia password</button></p>
                     }
 
 
