@@ -24,6 +24,7 @@ class ShowEvents extends Component{
             color: ""
         }
         this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
+        this.value_temp = ""
 
     }
 
@@ -64,6 +65,7 @@ class ShowEvents extends Component{
 
         const addUpdatedData =() => {
             //send this.state.event
+            console.log(this.state.event)
         }
 
 
@@ -120,6 +122,12 @@ class ShowEvents extends Component{
 
         const handleColorChange = ({ hex }) => {
             copy_event.color = hex
+            this.setState({[this.state.event]: copy_event})
+        }
+
+
+        const handleValue = (e, data) => {
+            copy_event[data.key] = e.target.value
             this.setState({[this.state.event]: copy_event})
         }
 
@@ -220,8 +228,6 @@ class ShowEvents extends Component{
                         />
                     </p>
 
-
-                    //update this props when the user updates the event
                     { (numero_prop===0)?
                         <p>
                         </p>
@@ -230,12 +236,10 @@ class ShowEvents extends Component{
                             if(index >= noMoreProps)
                                 return(
                                     <p>
-                                        <TextField id="standard-basic" defaultValue={key}  disabled={this.state.updateView}/>
+                                        <TextField id={"standard-basic "+key} defaultValue={key} disabled={true}/>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <TextField id="filled-basic" variant="filled" defaultValue={this.state.event[key]} disabled={this.state.updateView}/>
+                                        <TextField id={"filled-basic "+key} variant="filled" onChange= {(e) => {handleValue(e, {key})}} defaultValue={this.state.event[key]} disabled={this.state.updateView}/>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <Button variant="outlined" size="medium" color="primary"  disabled={this.state.updateView}>Aggiorna</Button>
-
                                     </p>
                                 )
                         })

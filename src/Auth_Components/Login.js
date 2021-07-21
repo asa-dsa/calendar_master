@@ -9,7 +9,8 @@ export class Login extends React.Component {
         this.state ={
             redirect_pwd : false,
             authenticated: false,
-            register: false
+            register: false,
+            error: false
         }
     }
 
@@ -37,12 +38,11 @@ export class Login extends React.Component {
                 console.log('Got the token: ', result.data)
                 sessionStorage.setItem('token', result.data)
                 alert('Login completato con successo\nBenvenuto ' + username + "!")
+                this.props.auth(username)
+                this.setState({authenticated: true})
             } else {
                 alert(result.error)
             }
-
-            this.props.auth(username)
-            this.setState({authenticated: true})
 
         }
 

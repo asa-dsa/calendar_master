@@ -29,7 +29,7 @@ export class App extends React.Component {
     }
 
     render() {
-        //console.log(localStorage.getItem("token"))
+        //console.log(sessionStorage.getItem('token'))
         return (
             <div className="App">
                 <h2>
@@ -47,7 +47,7 @@ export class App extends React.Component {
                 <BrowserRouter>
                     <Route exact path="/">
                         {this.state.authenticated ?
-                            <CalendarPopup auth={this.state.authenticated}/>
+                            <CalendarPopup/>
                             :
                             <Redirect to="/login" />
                         }
