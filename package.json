@@ -12,6 +12,7 @@
     "font-awesome": "^4.7.0",
     "form-schema-validation": "^1.17.5",
     "formik": "^2.2.9",
+    "jwt-decode": "^3.1.2",
     "little-state-machine": "^4.1.2",
     "mobx-react-form": "^3.1.0",
     "moment": "^2.29.1",

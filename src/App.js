@@ -14,31 +14,32 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            authenticated: !(localStorage.getItem('token') === null)
+            authenticated: !(sessionStorage.getItem('token') === null)
         }
         this.handleUpdate = this.handleUpdate.bind(this)
     }
 
     handleUpdate = (data) =>{
         this.setState({authenticated: true})
-        this.setState({user: data})
     }
 
     handleLogOut = () =>  {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         window.location.reload();
     }
 
     render() {
-        console.log(localStorage.getItem("token"))
+        //console.log(localStorage.getItem("token"))
         return (
             <div className="App">
                 <h2>
                     <center>Calendario AM - SS </center></h2>
                     {(this.state.authenticated) ?
+                        <p>
                         <center> <button type="submit" className="btn btn-primary btn-block" onClick={this.handleLogOut}>Log
                             out</button>
                         </center>
+                            </p>
                     :
                         <p></p>
                     }
@@ -46,7 +47,7 @@ export class App extends React.Component {
                 <BrowserRouter>
                     <Route exact path="/">
                         {this.state.authenticated ?
-                            <CalendarPopup auth={this.state.authenticated} username={this.state.user}/>
+                            <CalendarPopup auth={this.state.authenticated}/>
                             :
                             <Redirect to="/login" />
                         }

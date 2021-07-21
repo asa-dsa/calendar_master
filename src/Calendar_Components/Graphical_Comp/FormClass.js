@@ -136,7 +136,6 @@ class FormClass extends Component{
 
         }
 
-
         const handlePropAdding = () =>{
             showProp[lastInserted++] = true
             this.setState({[this.prop_temp]:this.value_temp})

@@ -15,6 +15,11 @@ import axios from "axios";
 
 import FormClass from "./Graphical_Comp/FormClass";
 import Header from "./Graphical_Comp/Header"
+import ShowEvents from "./Graphical_Comp/ShowEvents"
+
+
+import jwtDecode from "jwt-decode";
+import {Redirect} from "react-router-dom";
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
@@ -24,6 +29,7 @@ const calendar_multiple_types = ["/list_cal_event_multiple?type"]
 const calendar_single_type = ["/list_cal_event?type"]
 
 //doc: https://jquense.github.io/react-big-calendar/examples/index.html
+//used SessionStorage instead of localStorage; to use localStorage, do not use state.username, but fetch the token from the cache ed decode it with jwt_decode(token) from jwt-decode
 class CalendarPopup extends Component {
 
     constructor(...args) {
@@ -32,22 +38,37 @@ class CalendarPopup extends Component {
         this.state = {
             events:[],
             culture: 'it',
-            views: true,
+            eventAddView: true,
+            eventView: true,
             startTime: 0,
             endTime: 0,
-            user: "UserTest"
+            eventToShow: "",
+            logged: !(jwtDecode(sessionStorage.getItem('token')) === null),
+            user: (jwtDecode(sessionStorage.getItem('token')).username)
         }
 
-        this.handler = this.handler.bind(this)
-        this.handlerViews = this.handlerViews.bind(this)
+        console.log(jwtDecode(sessionStorage.getItem('token')))
+
+        this.handlerHeader = this.handlerHeader.bind(this)
+        this.handlerAddEvents = this.handlerAddEvents.bind(this)
+        this.handlerEventViews = this.handlerEventViews.bind(this)
+
+    }
+
+    isThereAUser(){
     }
 
     componentDidMount(){
         this.connectToServer();
     }
 
-    handlerViews = () => {
-        this.setState({views: true})
+    handlerAddEvents = () => {
+        this.setState({eventAddView: true})
+    }
+
+    handlerEventViews = () => {
+        this.setState({eventView: true})
+
     }
 
     connectToServer() {
@@ -65,7 +86,7 @@ class CalendarPopup extends Component {
             })
     }
 
-    handler = (val) => {
+    handlerHeader = (val) => {
         if((val.toString()).search(',') <0)
             this.get_event_uri = default_uri + calendar_single_type.toString() + "=" + val.toString()
         else
@@ -76,7 +97,7 @@ class CalendarPopup extends Component {
     handleSelect = ({start, end}) => {
         alert("Intervallo orario selezionato: \n" + start + "\n" + end)
         this.setState({startTime:start, endTime:end})
-        this.setState({views: false})
+        this.setState({eventAddView: false})
 
        // this.setState('url')
         /*const title = window.prompt('New Event name')
@@ -98,8 +119,8 @@ class CalendarPopup extends Component {
 
     //9 elements; from the 9-th element, they are all extra props (to 5 - max limit)
     handleClickedEvent  = (e) => {
-        alert("Elenco props. evento")
-        console.log(Object.keys(e))
+        this.setState({eventToShow: e, eventView:false})
+        //alert(this.state.user)
         //send to the visualizer class the e event
         //the visualizer class must count the prop
         //if |props| == 9, shows only essential data
@@ -121,35 +142,50 @@ class CalendarPopup extends Component {
 
         return(
             <React.Fragment>
-                {(!this.state.views)?
+                {(!this.state.logged)?
+                    <Redirect to="/" />
+                    :
+                    (!this.state.eventAddView)?
                     <div>
-                        <FormClass handlerViews={this.handlerViews} start={this.state.startTime} end={this.state.endTime} uri={default_uri}/>
+                        <FormClass handlerViews={this.handlerAddEvents} start={this.state.startTime} end={this.state.endTime} uri={default_uri}/>
                     </div>
                 :
-                <div>
-                    <Header handler={this.handler} uri={default_uri} owner={this.state.user}/>
-                    <Calendar
-                    popup
-                    selectable
-                    culture={this.state.culture}
-                    messages={{'today': "Oggi", "previous":'Precedente', "next":"Successivo",
-                        "month":"Mese", "week":"Settimana", "day":"Giorno", "agenda": "Agenda Giornaliera",
-                        noEventsInRange: 'Non ci sono eventi nella giornata corrente.'}}
-                    events={copy}
-                    localizer={globalizeLocalize}
-                    defaultDate={new Date()}
-                    defaultView={"week"}
-                    onSelectEvent={this.handleClickedEvent}
-                    onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
-                    onSelectSlot={this.handleSelect}
-                    style={{height: "100vh"}}
-                    eventPropGetter={event => {
-                        return {
-                            style: {backgroundColor: event.color}
-                        }
-                    }}
-                   />
-                </div>
+                    (!this.state.eventView)?
+                        <div>
+                            <ShowEvents handlerViews={this.handlerEventViews} event={this.state.eventToShow}/>
+                        </div>
+                        :
+                        <div>
+                            <Header handler={this.handlerHeader} uri={default_uri} owner={this.state.user}/>
+                            <Calendar
+                                popup
+                                selectable
+                                culture={this.state.culture}
+                                messages={{
+                                    'today': "Oggi",
+                                    "previous": 'Precedente',
+                                    "next": "Successivo",
+                                    "month": "Mese",
+                                    "week": "Settimana",
+                                    "day": "Giorno",
+                                    "agenda": "Agenda Giornaliera",
+                                    noEventsInRange: 'Non ci sono eventi nella giornata corrente.'
+                                }}
+                                events={copy}
+                                localizer={globalizeLocalize}
+                                defaultDate={new Date()}
+                                defaultView={"month"}
+                                onSelectEvent={this.handleClickedEvent}
+                                onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
+                                onSelectSlot={this.handleSelect}
+                                style={{height: "100vh"}}
+                                eventPropGetter={event => {
+                                    return {
+                                        style: {backgroundColor: event.color}
+                                    }
+                                }}
+                            />
+                        </div>
                 }
             </React.Fragment>
         )

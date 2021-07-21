@@ -35,7 +35,7 @@ export class Login extends React.Component {
             if (result.status === 'ok') {
                 // everythign went fine
                 console.log('Got the token: ', result.data)
-                localStorage.setItem('token', result.data)
+                sessionStorage.setItem('token', result.data)
                 alert('Login completato con successo\nBenvenuto ' + username + "!")
             } else {
                 alert(result.error)
