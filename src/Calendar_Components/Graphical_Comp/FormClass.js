@@ -274,7 +274,6 @@ class FormClass extends Component{
                     :<p></p>
                     }
 
-
                     <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
                     <p><Button variant="contained" onClick={onSend}>Aggiungi evento</Button></p>
                 </div>

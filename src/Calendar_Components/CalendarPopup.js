@@ -152,7 +152,7 @@ class CalendarPopup extends Component {
                 :
                     (!this.state.eventView)?
                         <div>
-                            <ShowEvents handlerViews={this.handlerEventViews} event={this.state.eventToShow}/>
+                            <ShowEvents handlerViews={this.handlerEventViews} uri={default_uri} event={this.state.eventToShow}/>
                         </div>
                         :
                         <div>
