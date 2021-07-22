@@ -33,6 +33,7 @@ export class Register extends React.Component {
             } else {
                 const username = this.state.username
                 const password = this.state.pwd
+                console.log(username, password)
 
                 const result = await fetch(this.props.uri+'/api/register', {
                     method: 'POST',
@@ -66,7 +67,7 @@ export class Register extends React.Component {
                     <h3>Registrazione</h3>
 
                     <div className="form-group">
-                        <label>Indirizzo mail</label>
+                        <label>Username</label>
                         <input type="email" className="form-control" placeholder="Inserisci indirizzo email" onChange={setMail} />
                     </div>
 

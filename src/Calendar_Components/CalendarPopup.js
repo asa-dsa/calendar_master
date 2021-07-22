@@ -14,6 +14,8 @@ import globalize from "globalize";
 import axios from "axios";
 
 import FormClass from "./Graphical_Comp/FormClass";
+import Precondition from "./Graphical_Comp/Precondition";
+import Authorization from "./Graphical_Comp/Authorization";
 import Header from "./Graphical_Comp/Header"
 import ShowEvents from "./Graphical_Comp/ShowEvents"
 
@@ -40,26 +42,36 @@ class CalendarPopup extends Component {
             culture: 'it',
             eventAddView: true,
             eventView: true,
+            authView: true,
+            preView: true,
             startTime: 0,
             endTime: 0,
             eventToShow: "",
             logged: !(jwtDecode(sessionStorage.getItem('token')) === null),
             user: (jwtDecode(sessionStorage.getItem('token')).username)
-        }
 
+        }
         console.log(jwtDecode(sessionStorage.getItem('token')))
 
         this.handlerHeader = this.handlerHeader.bind(this)
         this.handlerAddEvents = this.handlerAddEvents.bind(this)
         this.handlerEventViews = this.handlerEventViews.bind(this)
+        this.handlerAuthView = this.handlerAuthView.bind(this)
+        this.handlerPreView = this.handlerPreView.bind(this)
 
-    }
-
-    isThereAUser(){
     }
 
     componentDidMount(){
         this.connectToServer();
+    }
+
+
+    handlerAuthView = (data) =>{
+        this.setState({authView: data})
+    }
+
+    handlerPreView = (data) =>{
+        this.setState({preView: data})
     }
 
     handlerAddEvents = () => {
@@ -120,11 +132,6 @@ class CalendarPopup extends Component {
     //9 elements; from the 9-th element, they are all extra props (to 5 - max limit)
     handleClickedEvent  = (e) => {
         this.setState({eventToShow: e, eventView:false})
-        //alert(this.state.user)
-        //send to the visualizer class the e event
-        //the visualizer class must count the prop
-        //if |props| == 9, shows only essential data
-        //otherwise, add n*2 text area to show the extra props
     }
 
 
@@ -145,10 +152,20 @@ class CalendarPopup extends Component {
                 {(!this.state.logged)?
                     <Redirect to="/" />
                     :
-                    (!this.state.eventAddView)?
-                    <div>
-                        <FormClass handlerViews={this.handlerAddEvents} start={this.state.startTime} end={this.state.endTime} uri={default_uri}/>
-                    </div>
+                        (!this.state.eventAddView)?
+                        <div>
+                            <FormClass handlerViews={this.handlerAddEvents} startTime={this.state.startTime} endTime={this.state.endTime} uri={default_uri}/>
+                        </div>
+                        :
+                        (!this.state.preView)?
+                            <div>
+                                <Precondition handlerViews={this.handlerPreView}  uri={default_uri}/>
+                            </div>
+                            :
+                            (!this.state.authView)?
+                                <div>
+                                    <Authorization handlerViews={this.handlerAuthView} uri={default_uri}/>
+                                </div>
                 :
                     (!this.state.eventView)?
                         <div>
@@ -156,7 +173,7 @@ class CalendarPopup extends Component {
                         </div>
                         :
                         <div>
-                            <Header handler={this.handlerHeader} uri={default_uri} owner={this.state.user}/>
+                            <Header handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri} owner={this.state.user}/>
                             <Calendar
                                 popup
                                 selectable

@@ -30,8 +30,8 @@ class FormClass extends Component{
             calendario: "",
             colore: "",
             tipo:"",
-            startTime: this.props.start,
-            endTime: this.props.end,
+            start: this.props.start,
+            end: this.props.end,
             calendar_names:[],
             newCal: false
         }
@@ -74,21 +74,21 @@ class FormClass extends Component{
         }
 
         const updateStartDate = (e) => {
-            this.setState({startTime: new Date(e.target.value)})
+            this.setState({start: new Date(e.target.value)})
         }
 
 
         const updateEndDate = (e) => {
             let endDate = new Date(e.target.value)
-            if(endDate-this.state.startTime >= oneDayMs || endDate <= this.state.startTime) {
-                const tempTime = new Date(this.state.startTime);
+            if(endDate-this.state.start >= oneDayMs || endDate <= this.state.start) {
+                const tempTime = new Date(this.state.start);
                 tempTime.setHours(23);
                 tempTime.setMinutes(59)
-                this.setState({endTime: tempTime})
+                this.setState({end: tempTime})
                 this.setState({error: true})
             }
             else
-                this.setState({endTime: endDate})
+                this.setState({end: endDate})
 
         }
 
@@ -190,7 +190,7 @@ class FormClass extends Component{
                             id="datetime-start"
                             label="Data e ora di inizio dell'evento"
                             type="datetime-local"
-                            defaultValue={(new Date(this.props.start - timezone_off)).toISOString().slice(0,-1).substring(0,16)}
+                            defaultValue={(new Date(this.props.startTime - timezone_off)).toISOString().slice(0,-1).substring(0,16)}
                             InputLabelProps={{
                                 shrink: true,
                             }}
@@ -202,7 +202,7 @@ class FormClass extends Component{
                             id="datetime-end"
                             label="Data e ora di fine dell'evento"
                             type="datetime-local"
-                            defaultValue={(new Date(this.props.end - timezone_off)).toISOString().slice(0,-1).substring(0,16)}
+                            defaultValue={(new Date(this.props.endTime - timezone_off)).toISOString().slice(0,-1).substring(0,16)}
                             InputLabelProps={{
                                 shrink: true,
                             }}

@@ -73,9 +73,12 @@ class Header extends Component{
         }
 
         const handleAddPre= () => {
+            this.props.handlerPre(false)
         }
 
         const handleAddAut = () => {
+            this.props.handlerAuth(false)
+
         }
 
 
@@ -91,7 +94,7 @@ class Header extends Component{
                     })
                 }
                 <input type="submit" value="Aggiorna la vista" onClick={handleSend} />
-                {(this.props.owner === "UserTest")?
+
                     <p align="center">
                         <input type="submit" value="Aggiungi un calendario" onClick={handleAddCal} />
                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -103,8 +106,7 @@ class Header extends Component{
                         &nbsp;&nbsp;&nbsp;&nbsp;
 
                     </p>
-                    :
-                    <p></p>
+
                 }
             </>
         )

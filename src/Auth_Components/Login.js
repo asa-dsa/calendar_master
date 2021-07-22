@@ -7,7 +7,6 @@ export class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state ={
-            redirect_pwd : false,
             authenticated: false,
             register: false,
             error: false
@@ -19,6 +18,7 @@ export class Login extends React.Component {
     render() {
 
         const handleSend = async () => {
+
             const username = this.state.name
             const password = this.state.pwd
 
@@ -32,6 +32,7 @@ export class Login extends React.Component {
                 username, password
                 })
             }).then((res) => res.json())
+
 
             if (result.status === 'ok') {
                 // everythign went fine
@@ -72,7 +73,7 @@ export class Login extends React.Component {
                         <h3>Accesso</h3>
 
                         <div className="form-group">
-                            <label>Indirizzo mail</label>
+                            <label>Username</label>
                             <input type="email" className="form-control" onChange={setName} placeholder="Inserisci indirizzo email" />
                         </div>
 
@@ -91,11 +92,6 @@ export class Login extends React.Component {
                             <button type="submit" className="btn btn-primary btn-block" onClick={handleRegister}>Registrati</button>
                         }                        &nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
-                        {(this.state.redirect) ?
-                            <Redirect to="/changepwd" />
-                        :
-                            <p><button type="submit" className="btn btn-primary btn-block" onClick={handleReset}>Password dimenticata?</button></p>
-                        }
 
                     </form>
                 }

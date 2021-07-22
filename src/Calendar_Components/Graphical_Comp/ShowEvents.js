@@ -21,7 +21,7 @@ class ShowEvents extends Component{
             event: this.props.event,
             updateView: true,
             calendar_names:[],
-            color: ""
+            error: false
         }
         this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
         this.value_temp = ""
@@ -64,13 +64,14 @@ class ShowEvents extends Component{
         }
 
         const addUpdatedData =() => {
-            //send this.state.event
+            if(this.state.error)
+                alert("Errore nell'inserimento della data di fine evento; data di fine evento impostata a " + this.state.event.end)
             console.log(this.state.event)
         }
 
 
         const updateStartDate = (e) => {
-            copy_event.startTime = e.target.value
+            copy_event.start = e.target.value
             this.setState({[this.state.event]: copy_event})
 
         }
@@ -78,15 +79,17 @@ class ShowEvents extends Component{
 
         const updateEndDate = (e) => {
             let endDate = new Date(e.target.value)
-            if(endDate-this.state.startTime >= oneDayMs || endDate <= this.state.startTime) {
-                const tempTime = new Date(this.state.startTime);
+            console.log(this.state.event.start)
+            if(endDate-this.state.event.start >= oneDayMs || endDate <= this.state.event.start) {
+                const tempTime = new Date(this.state.event.start);
                 tempTime.setHours(23);
                 tempTime.setMinutes(59)
-                copy_event.endTime = tempTime
+                copy_event.end = tempTime
                 this.setState({[this.state.event]: copy_event})
+                this.setState({error: true})
             }
             else{
-                copy_event.endTime = e.target.value
+                copy_event.end = endDate
                 this.setState({[this.state.event]: copy_event})
             }
 
@@ -134,6 +137,8 @@ class ShowEvents extends Component{
         let timezone_off = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
         let numero_prop = (Object.keys(this.state.event).length - noMoreProps)
 
+
+        console.log(this.state.event)
         return(
 
             <div>
@@ -247,7 +252,7 @@ class ShowEvents extends Component{
 
                 <p><Button variant="contained" onClick={updateData}>Modifica l'evento</Button>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button variant="contained" onClick={addUpdatedData} disabled={this.state.updateView}>Aggiungi l'evento modificato</Button></p>
+                <Button variant="contained" onClick={addUpdatedData} disabled={this.state.updateView}>Salva l'evento modificato</Button></p>
                 <p><Button variant="contained" onClick={deleteEvent}>Cancella l'evento</Button></p>
                 <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
                 </div>
