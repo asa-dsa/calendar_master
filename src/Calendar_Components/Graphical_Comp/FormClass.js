@@ -12,7 +12,6 @@ const maxProps = 5
 const getAllCal_uri = "/cal"
 
 
-
 let showProp = new Array(maxProps);
 let lastInserted = 0
 
@@ -47,15 +46,17 @@ class FormClass extends Component{
         this.getCalNamesFromServer();
     }
 
+
     getCalNamesFromServer() {
-        axios.get(this.get_calendar_names_uri)
+        axios.post(this.get_calendar_names_uri, {
+        })
             .then(response => {
                 //console.log(response.data)
                 this.setState({calendar_names: response.data})
             })
-            .catch(error =>{
+            .catch(function (error) {
                 console.log(error);
-            })
+            });
     }
 
 

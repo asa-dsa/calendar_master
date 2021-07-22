@@ -83,6 +83,25 @@ class CalendarPopup extends Component {
 
     }
 
+
+
+
+    connectToServer() {
+        this.setState({events:[]})
+
+        axios.post(this.get_event_uri, {
+        })
+            .then(response => {
+                //console.log(response.data)
+                this.setState({events: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
+/*
     connectToServer() {
         this.setState({events:[]})
         //console.log("Connecting to server at this uri:" + this.get_event_uri)
@@ -97,7 +116,7 @@ class CalendarPopup extends Component {
                 this.setState({error: 'Error'});
             })
     }
-
+*/
     handlerHeader = (val) => {
         if((val.toString()).search(',') <0)
             this.get_event_uri = default_uri + calendar_single_type.toString() + "=" + val.toString()

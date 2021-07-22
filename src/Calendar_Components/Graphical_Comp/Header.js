@@ -22,15 +22,15 @@ class Header extends Component{
     }
 
     callServer() {
-        axios.get(this.get_calendar_names_uri)
+        axios.post(this.get_calendar_names_uri, {
+            })
             .then(response => {
                 //console.log(response.data)
-                this.setState({posts: response.data});
+                this.setState({posts: response.data})
             })
-            .catch(error =>{
+            .catch(function (error) {
                 console.log(error);
-                this.setState({error: 'Error'});
-            })
+            });
     }
 
 
@@ -104,10 +104,9 @@ class Header extends Component{
 
                         <input type="submit" value="Aggiungi autorizzazione" onClick={handleAddAut} />
                         &nbsp;&nbsp;&nbsp;&nbsp;
-
                     </p>
 
-                }
+
             </>
         )
     }
