@@ -27,6 +27,8 @@ require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
 
 const default_uri = "http://192.168.188.79:12345"
+const getEventforUser = "/event_vis"
+
 const calendar_multiple_types = ["/list_cal_event_multiple?type"]
 const calendar_single_type = ["/list_cal_event?type"]
 
@@ -36,7 +38,6 @@ class CalendarPopup extends Component {
 
     constructor(...args) {
         super(...args)
-        this.get_event_uri = default_uri + "/"
         this.state = {
             events:[],
             culture: 'it',
@@ -48,8 +49,6 @@ class CalendarPopup extends Component {
             endTime: 0,
             eventToShow: "",
             logged: !(jwtDecode(sessionStorage.getItem('token')) === null),
-            user: (jwtDecode(sessionStorage.getItem('token')).username)
-
         }
         console.log(jwtDecode(sessionStorage.getItem('token')))
 
@@ -84,16 +83,19 @@ class CalendarPopup extends Component {
     }
 
 
-
-
-    connectToServer() {
-        this.setState({events:[]})
-
-        axios.post(this.get_event_uri, {
-        })
+    connectToServer(data) {
+        let payload = { id: jwtDecode(sessionStorage.getItem('token')).id, username: jwtDecode(sessionStorage.getItem('token')).username, calendar: data};
+        axios.post(default_uri + getEventforUser, payload)
             .then(response => {
                 //console.log(response.data)
-                this.setState({events: response.data})
+                let actual_events = this.state.events.map(item => ({...item}))
+                let actual_size = actual_events.length
+
+                for(let i=0; i< response.data.length; i++)
+                    actual_events[actual_size++] = response.data[i]
+                this.setState(state => ({
+                    events :actual_events
+                }))
             })
             .catch(function (error) {
                 console.log(error);
@@ -101,34 +103,17 @@ class CalendarPopup extends Component {
     }
 
 
-/*
-    connectToServer() {
-        this.setState({events:[]})
-        //console.log("Connecting to server at this uri:" + this.get_event_uri)
-        console.log(this.get_event_uri)
-        axios.get(this.get_event_uri)
-            .then(response => {
-                this.setState({events: response.data});
-
-            })
-            .catch(error =>{
-                console.log(error);
-                this.setState({error: 'Error'});
-            })
-    }
-*/
     handlerHeader = (val) => {
-        if((val.toString()).search(',') <0)
-            this.get_event_uri = default_uri + calendar_single_type.toString() + "=" + val.toString()
-        else
-            this.get_event_uri = default_uri + calendar_multiple_types.toString() + "=" + val.toString()
-        this.connectToServer();
+        this.setState({events:[]})
+        for(let i=0; i< val.length; i++)
+            this.connectToServer(val[i])
     }
 
     handleSelect = ({start, end}) => {
         alert("Intervallo orario selezionato: \n" + start + "\n" + end)
         this.setState({startTime:start, endTime:end})
         this.setState({eventAddView: false})
+
 
        // this.setState('url')
         /*const title = window.prompt('New Event name')
@@ -164,8 +149,6 @@ class CalendarPopup extends Component {
                 copy[index].allDay = (event.allDay === 'true')
             })
         }
-
-
         return(
             <React.Fragment>
                 {(!this.state.logged)?
@@ -192,7 +175,7 @@ class CalendarPopup extends Component {
                         </div>
                         :
                         <div>
-                            <Header handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri} owner={this.state.user}/>
+                            <Header handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri}/>
                             <Calendar
                                 popup
                                 selectable

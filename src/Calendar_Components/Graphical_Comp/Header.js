@@ -1,8 +1,9 @@
 import React, {Component} from "react";
 import axios from "axios";
 import {Switch} from "pretty-checkbox-react";
+import jwtDecode from "jwt-decode";
 
-const getAllCal_uri = "/cal"
+const getAllCal_uri = "/user_cal"
 
 
 class Header extends Component{
@@ -22,10 +23,9 @@ class Header extends Component{
     }
 
     callServer() {
-        axios.post(this.get_calendar_names_uri, {
-            })
+        let payload = { id: jwtDecode(sessionStorage.getItem('token')).id, username: jwtDecode(sessionStorage.getItem('token')).username};
+        axios.post(this.get_calendar_names_uri, payload)
             .then(response => {
-                //console.log(response.data)
                 this.setState({posts: response.data})
             })
             .catch(function (error) {
@@ -35,25 +35,17 @@ class Header extends Component{
 
 
     render(){
-
-        let cal = []
         const {posts} = this.state;
-        if(this.state.posts.length){
-            posts.map((post, index) =>{
-                cal[index] = post.Type
-            })
-        }
-
         const handleChange = (event) =>{
-            if(!(this.state.params.find(element => element === event.target.value.toString()))) {
+            if(!(this.state.params.find(element => element === event.target.id.toString()))) {
                 this.setState(state => ({
-                    params : [...state.params, event.target.value.toString()]
+                    params : [...state.params, event.target.id.toString()]
                 }))
             }
             else {
                 let temp = [], j=0
                 for(let i=0; i<this.state.params.length; i++)
-                    if(!(this.state.params[i] === event.target.value.toString()))
+                    if(!(this.state.params[i] === event.target.id.toString()))
                         temp[j++]= this.state.params[i]
                 this.setState(() => ({
                     params : temp
@@ -85,10 +77,10 @@ class Header extends Component{
         return (
             <>
                 {
-                    cal.map((item, index) => {
+                    posts.map((item, index) => {
                         return(
-                            <Switch key= {index} id={index} value={item} onChange={handleChange}>
-                                {item}
+                            <Switch key= {index} id={item.id} value={item.value} onChange={handleChange}>
+                                {item.type}
                             </Switch>
                         )
                     })
