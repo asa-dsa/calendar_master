@@ -168,9 +168,6 @@ class CalendarPopup extends Component {
         this.setState({eventToShow: e, eventView:false})
     }
 
-    //TODO: controllo delle autorizzazioni e verifica nomi parametri JSON
-    //TODO: creazione calendario, modifica e cancellazione
-
     render(){
         const copy = this.state.events.map(item => ({...item}))
         if(this.state.events.length){
