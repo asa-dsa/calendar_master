@@ -77,7 +77,7 @@ class ShowEvents extends Component{
             const a = JSON.stringify({"username": this.state.user})
             let payload = (temp_payload.concat(a)).replace("}{", ",")
 
-            axios.post(this.deleteURL, payload)
+            axios.post(this.updateURL, payload)
                 .then(response => {
                     console.log(response.data)
                     alert(response.data)
