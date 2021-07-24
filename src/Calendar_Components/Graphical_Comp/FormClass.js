@@ -9,7 +9,7 @@ import Select from '@material-ui/core/Select';
 
 const oneDayMs = 86400 * 1000
 const maxProps = 5
-const getAllCal_uri = "/cal"
+const insertUri = "/insert_event"
 
 
 let showProp = new Array(maxProps);
@@ -18,74 +18,46 @@ let lastInserted = 0
 class FormClass extends Component{
 
 
-    /*
-    calendario, tipo
-     */
     constructor(props) {
         super(props);
         this.state = {
             title: "",
             allDay: false,
-            calendario: "",
-            colore: "",
-            tipo:"",
-            start: this.props.start,
-            end: this.props.end,
-            calendar_names:[],
-            newCal: false
+            calendar: "",
+            color: "",
+            type:"",
+            start: new Date(this.props.startTime).valueOf(),
+            end: new Date(this.props.endTime).valueOf(),
+            creator: this.props.creator
         }
+        this.calendar_names = this.props.calendars
         this.prop_temp = ""
         this.value_temp = ""
-        this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
+        this.insertURL = this.props.uri + insertUri;
         for (let i=0; i<maxProps; i++)
             showProp[i] = false
         lastInserted = 0
     }
 
-    componentDidMount(){
-        this.getCalNamesFromServer();
-    }
-
-
-    getCalNamesFromServer() {
-        axios.post(this.get_calendar_names_uri, {
-        })
-            .then(response => {
-                //console.log(response.data)
-                this.setState({calendar_names: response.data})
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
-
 
     render() {
-        let cal = []
-        const {calendar_names} = this.state;
-        if(this.state.calendar_names.length){
-            calendar_names.map((post, index) =>{
-                cal[index] = post.Type
-            })
-        }
-
         //use when send a message to return back to the calendar
         const handleSend = () => {
             this.props.handlerViews()
         }
 
         const updateStartDate = (e) => {
-            this.setState({start: new Date(e.target.value)})
+            this.setState({start: (new Date(e.target.value).valueOf)})
         }
 
 
         const updateEndDate = (e) => {
-            let endDate = new Date(e.target.value)
+            let endDate = new Date(e.target.value).valueOf()
             if(endDate-this.state.start >= oneDayMs || endDate <= this.state.start) {
                 const tempTime = new Date(this.state.start);
                 tempTime.setHours(23);
                 tempTime.setMinutes(59)
-                this.setState({end: tempTime})
+                this.setState({end: tempTime.valueOf})
                 this.setState({error: true})
             }
             else
@@ -98,23 +70,38 @@ class FormClass extends Component{
         }
 
         const updateCal = (e) => {
-            this.setState({calendario: e.target.value})
+            this.setState({calendar: e.target.value})
         }
 
 
         const updateType = (e) => {
-            this.setState({tipo: (e.target.value).toUpperCase()})
+            this.setState({type: (e.target.value).toUpperCase()})
         }
 
         const updateCheckBox = () => {
             this.setState({allDay : !this.state.allDay})
         }
 
+        function replacer(key, value) {
+            if (typeof value === 'number' || typeof value === 'boolean') {
+                if(key === "start" || key ==="end")
+                    return (value/1000).toString()
+                return value.toString()
+            }
+            return value
+        }
 
         const onSend =() => {
-            console.log(this.state)
             if(this.state.error)
                 alert("Errore nell'inserimento della data di fine evento; data di fine evento impostata a " + this.state.endTime)
+            let payload = JSON.stringify(this.state, replacer)
+            axios.post(this.insertURL, payload)
+                .then(response => {
+                    console.log(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             handleSend()
         }
 
@@ -124,7 +111,7 @@ class FormClass extends Component{
 
 
         const handleColorChange = ({ hex }) => {
-            this.setState({colore: hex})
+            this.setState({color: hex})
         }
 
         const handleProp = (e) => {
@@ -155,15 +142,16 @@ class FormClass extends Component{
 
                         <p>
                             <label>Nome del calendario </label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
                             <Select
                                 onChange={updateCal}
                                 defaultValue={""}
                             >
                                 {
-                                    cal.map((item, index) => {
+                                    this.calendar_names.map((item, index) => {
                                         return (
-                                            <MenuItem key={index} id={index} value={item} onChange={updateCal}>
-                                                {item}
+                                            <MenuItem key={index} id={index} value={item.id} onChange={updateCal}>
+                                                {item.type}
                                             </MenuItem>
                                         )
                                     })
@@ -182,7 +170,7 @@ class FormClass extends Component{
                         </p><p>
                         <CirclePicker
                             onChangeComplete={handleColorChange}
-                            color = {this.state.colore}
+                            color = {this.state.color}
                         />
                     </p>
 

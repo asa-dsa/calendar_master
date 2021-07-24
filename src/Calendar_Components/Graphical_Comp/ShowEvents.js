@@ -10,8 +10,11 @@ import Select from "@material-ui/core/Select";
 
 
 const noMoreProps = 9
-const getAllCal_uri = "/cal"
+const delete_uri = "/delete_event"
+const update_uri = "/mod_event"
+
 const oneDayMs = 86400 * 1000
+
 
 class ShowEvents extends Component{
 
@@ -20,90 +23,118 @@ class ShowEvents extends Component{
         this.state = {
             event: this.props.event,
             updateView: true,
-            calendar_names:[],
-            error: false
+            calendar_names: this.props.calendars,
+            error: false,
+            user: this.props.user
         }
-        this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
+        this.deleteURL = this.props.uri + delete_uri;
+        this.updateURL = this.props.uri + update_uri;
         this.value_temp = ""
-
+        this.disableUpdateNoOwner = !(this.state.user === this.state.event.creator)
     }
 
-    componentDidMount(){
-        this.getCalNamesFromServer();
-    }
-
-
-    getCalNamesFromServer() {
-        axios.get(this.get_calendar_names_uri)
-            .then(response => {
-                //console.log(response.data)
-                this.setState({calendar_names: response.data})
-            })
-            .catch(error =>{
-                console.log(error);
-            })
-    }
 
     render(){
         let copy_event = this.state.event
-        let cal = []
         const {calendar_names} = this.state;
-        if(this.state.calendar_names.length){
-            calendar_names.map((post, index) =>{
-                cal[index] = post.Type
-            })
-        }
 
 
         const backToCal =() => {
             this.props.handlerViews()
         }
 
+        const backToCalNoUpd =() => {
+            this.props.handlernoUpd()
+        }
+
         const updateData =() => {
             this.setState({updateView: false})
+            copy_event.start = new Date(this.state.event.start).valueOf()
+            copy_event.end = new Date(this.state.event.end).valueOf()
+            const a = JSON.stringify(this.state.event._id)
+            const user_id = a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+            copy_event._id = user_id
+            this.setState({event: copy_event})
+
+        }
+
+
+
+        function replacer(key, value) {
+            if (typeof value === 'number' || typeof value === 'boolean') {
+                if(key === "start" || key ==="end")
+                    return (value/1000).toString()
+                return value.toString()
+            }
+            return value
         }
 
         const addUpdatedData =() => {
             if(this.state.error)
                 alert("Errore nell'inserimento della data di fine evento; data di fine evento impostata a " + this.state.event.end)
-            console.log(this.state.event)
-        }
 
+            const temp_payload = JSON.stringify(this.state.event, replacer)
+            const a = JSON.stringify({"username": this.state.user})
+            let payload = (temp_payload.concat(a)).replace("}{", ",")
+
+            axios.post(this.deleteURL, payload)
+                .then(response => {
+                    console.log(response.data)
+                    alert(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            //N.B. date non aggiornabili - se aggiornabili, dividi per mille
+            //backToCal()
+        }
 
         const updateStartDate = (e) => {
-            copy_event.start = e.target.value
+            copy_event.start = new Date(e.target.value).valueOf()
             this.setState({[this.state.event]: copy_event})
-
         }
 
-
         const updateEndDate = (e) => {
-            let endDate = new Date(e.target.value)
-            console.log(this.state.event.start)
+            let endDate = new Date(e.target.value).valueOf()
             if(endDate-this.state.event.start >= oneDayMs || endDate <= this.state.event.start) {
                 const tempTime = new Date(this.state.event.start);
                 tempTime.setHours(23);
                 tempTime.setMinutes(59)
-                copy_event.end = tempTime
+                copy_event.end = tempTime.valueOf()
                 this.setState({[this.state.event]: copy_event})
                 this.setState({error: true})
             }
             else{
-                copy_event.end = endDate
+                copy_event.end = endDate.valueOf()
                 this.setState({[this.state.event]: copy_event})
             }
 
         }
 
+        const deleteEvent = () => {
+            if(this.state.event.creator === this.state.user) {
+                const a = JSON.stringify(this.state.event._id)
+                const user_id = a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                alert("Cancellazione dell'evento " + this.state.event.title)
 
-        const deleteEvent =() => {
-            alert("Cancellazione evento")
+                let to_send = {
+                    "_id": user_id,
+                    "user": this.state.user
+                }
+
+                let payload = JSON.stringify(to_send)
+                axios.post(this.deleteURL, payload)
+                    .then(response => {
+                        alert(response.data)
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+            else {
+                alert("Non sei abilitato a cancellare l'evento")
+            }
             backToCal()
-        }
-
-        const updateCal = (e) => {
-            copy_event.calendar = e.target.value
-            this.setState({[this.state.event]: copy_event})
         }
 
 
@@ -137,8 +168,6 @@ class ShowEvents extends Component{
         let timezone_off = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
         let numero_prop = (Object.keys(this.state.event).length - noMoreProps)
 
-
-        console.log(this.state.event)
         return(
 
             <div>
@@ -151,35 +180,43 @@ class ShowEvents extends Component{
                             onChange={updateTitle}
                         />
                     </p>
-
                     <p>
-                        {(this.state.updateView)?
-                            <TextField
+                        <TextField
                             label="Nome del calendario"
-                            defaultValue={this.state.event.calendar}
-                            disabled={this.state.updateView}
-                            />
-                        :
-                            <p>
-                                <label>Nome del calendario </label>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <Select
-                                    onChange={updateCal}
-                                    defaultValue={this.state.event.calendar}
-                                >
-                                    {
-                                        cal.map((item, index) => {
-                                            return (
-                                                <MenuItem key={index} id={index} value={item} onChange={updateCal}>
-                                                    {item}
-                                                </MenuItem>
-                                            )
-                                        })
-                                    }
-                                </Select>
-                            </p>
-                        }
+                            defaultValue={(this.state.event.calendar)}
+                            disabled={true}
+                        />
                     </p>
+
+                    {/*<p>*/}
+                    {/*        (this.state.updateView || this.disableUpdateNoOwner)?*/}
+                    {/*        <TextField*/}
+                    {/*        label="Nome del calendario"*/}
+                    {/*        defaultValue={(this.state.event.calendar)}*/}
+                    {/*        disabled={this.disableUpdateNoOwner}*/}
+                    {/*        />*/}
+                    {/*    :*/}
+                    {/*        <p>*/}
+                    {/*            <label>Nome del calendario </label>*/}
+                    {/*            &nbsp;&nbsp;&nbsp;&nbsp;*/}
+                    {/*            <Select*/}
+                    {/*                onChange={updateCal}*/}
+                    {/*                defaultValue={(this.state.event.calendar)}*/}
+                    {/*            >*/}
+                    {/*                {*/}
+                    {/*                    calendar_names.map((item, index) => {*/}
+                    {/*                        return (*/}
+                    {/*                            <MenuItem key={index} id={item.id} value={item.id} onChange={updateCal}>*/}
+                    {/*                                {item.type}*/}
+                    {/*                            </MenuItem>*/}
+                    {/*                        )*/}
+                    {/*                    })*/}
+                    {/*                }*/}
+                    {/*            </Select>*/}
+                    {/*        </p>*/}
+                    {/*    }*/}
+                    {/*</p>*/}
+
                     <p>
                         <TextField
                             label="Tipo dell'evento"
@@ -206,7 +243,7 @@ class ShowEvents extends Component{
                             label="Data e ora di inizio dell'evento"
                             type="datetime-local"
                             defaultValue={(new Date(this.state.event.start- timezone_off)).toISOString().slice(0,-1).substring(0,16)}
-                            disabled={this.state.updateView}
+                            disabled={this.disableUpdateNoOwner}
                             onChange={updateStartDate}
                         />
                     </p>
@@ -216,7 +253,7 @@ class ShowEvents extends Component{
                             label="Data e ora di fine dell'evento"
                             type="datetime-local"
                             defaultValue={(new Date(this.state.event.end- timezone_off)).toISOString().slice(0,-1).substring(0,16)}
-                            disabled={this.state.updateView}
+                            disabled={this.disableUpdateNoOwner}
                             onChange={updateEndDate}
 
                         />
@@ -228,7 +265,7 @@ class ShowEvents extends Component{
                             defaultValue={this.state.event.allDay}
                             checked={this.state.event.allDay}
                             name="allDay"
-                            disabled={this.state.updateView}
+                            disabled={this.disableUpdateNoOwner}
                             onChange={updateCheckBox}
                         />
                     </p>
@@ -254,7 +291,7 @@ class ShowEvents extends Component{
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <Button variant="contained" onClick={addUpdatedData} disabled={this.state.updateView}>Salva l'evento modificato</Button></p>
                 <p><Button variant="contained" onClick={deleteEvent}>Cancella l'evento</Button></p>
-                <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
+                <p><Button variant="contained" onClick={backToCalNoUpd}>Torna al calendario</Button></p>
                 </div>
 
             </div>

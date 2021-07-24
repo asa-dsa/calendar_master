@@ -47,10 +47,6 @@ export class Login extends React.Component {
 
         }
 
-        const handleReset = () => {
-            this.setState({redirect_pwd: true})
-        }
-
         const handleRegister = () =>{
             this.setState({register: true})
         }

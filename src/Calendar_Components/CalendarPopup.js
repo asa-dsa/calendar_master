@@ -28,9 +28,7 @@ const globalizeLocalize = local(globalize)
 
 const default_uri = "http://192.168.188.79:12345"
 const getEventforUser = "/event_vis"
-
-const calendar_multiple_types = ["/list_cal_event_multiple?type"]
-const calendar_single_type = ["/list_cal_event?type"]
+const getAllCal_uri = "/user_cal"
 
 //doc: https://jquense.github.io/react-big-calendar/examples/index.html
 //used SessionStorage instead of localStorage; to use localStorage, do not use state.username, but fetch the token from the cache ed decode it with jwt_decode(token) from jwt-decode
@@ -49,6 +47,7 @@ class CalendarPopup extends Component {
             endTime: 0,
             eventToShow: "",
             logged: !(jwtDecode(sessionStorage.getItem('token')) === null),
+
         }
         console.log(jwtDecode(sessionStorage.getItem('token')))
 
@@ -57,11 +56,34 @@ class CalendarPopup extends Component {
         this.handlerEventViews = this.handlerEventViews.bind(this)
         this.handlerAuthView = this.handlerAuthView.bind(this)
         this.handlerPreView = this.handlerPreView.bind(this)
+        this.handlerEventViews_withRefresh = this.handlerEventViews_withRefresh.bind(this)
 
     }
 
     componentDidMount(){
-        this.connectToServer();
+        this.connectToServer("");
+        this.getCalNamesFromServer();
+    }
+
+
+    getCalName (cal_id) {
+        for (let i = 0; i < this.state.calendar_names.length; i++) {
+            if (this.state.calendar_names[i].id === cal_id)
+                return this.state.calendar_names[i].type
+        }
+        return null
+    }
+
+
+    getCalNamesFromServer() {
+        let payload = { id: jwtDecode(sessionStorage.getItem('token')).id, username: jwtDecode(sessionStorage.getItem('token')).username};
+        axios.post(default_uri+getAllCal_uri, payload)
+            .then(response => {
+                this.setState({calendar_names: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
 
@@ -75,12 +97,19 @@ class CalendarPopup extends Component {
 
     handlerAddEvents = () => {
         this.setState({eventAddView: true})
+        this.setState({events:[]})
     }
 
     handlerEventViews = () => {
         this.setState({eventView: true})
+        this.setState({events:[]})
 
     }
+
+    handlerEventViews_withRefresh = () => {
+        this.setState({eventView: true})
+    }
+
 
 
     connectToServer(data) {
@@ -135,10 +164,12 @@ class CalendarPopup extends Component {
 
     //9 elements; from the 9-th element, they are all extra props (to 5 - max limit)
     handleClickedEvent  = (e) => {
+        e.calendar = (this.getCalName(e.calendar))
         this.setState({eventToShow: e, eventView:false})
     }
 
-
+    //TODO: controllo delle autorizzazioni e verifica nomi parametri JSON
+    //TODO: creazione calendario, modifica e cancellazione
 
     render(){
         const copy = this.state.events.map(item => ({...item}))
@@ -156,7 +187,7 @@ class CalendarPopup extends Component {
                     :
                         (!this.state.eventAddView)?
                         <div>
-                            <FormClass handlerViews={this.handlerAddEvents} startTime={this.state.startTime} endTime={this.state.endTime} uri={default_uri}/>
+                            <FormClass creator={jwtDecode(sessionStorage.getItem('token')).id} calendars={this.state.calendar_names} handlerViews={this.handlerAddEvents} startTime={this.state.startTime} endTime={this.state.endTime} uri={default_uri}/>
                         </div>
                         :
                         (!this.state.preView)?
@@ -171,7 +202,7 @@ class CalendarPopup extends Component {
                 :
                     (!this.state.eventView)?
                         <div>
-                            <ShowEvents handlerViews={this.handlerEventViews} uri={default_uri} event={this.state.eventToShow}/>
+                            <ShowEvents user={jwtDecode(sessionStorage.getItem('token')).id} calendars={this.state.calendar_names} handlernoUpd={this.handlerEventViews_withRefresh} handlerViews={this.handlerEventViews} uri={default_uri} event={this.state.eventToShow}/>
                         </div>
                         :
                         <div>
@@ -193,7 +224,7 @@ class CalendarPopup extends Component {
                                 events={copy}
                                 localizer={globalizeLocalize}
                                 defaultDate={new Date()}
-                                defaultView={"month"}
+                                defaultView={"week"}
                                 onSelectEvent={this.handleClickedEvent}
                                 onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
                                 onSelectSlot={this.handleSelect}
