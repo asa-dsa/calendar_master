@@ -1,5 +1,9 @@
 import React, {Component} from "react";
 import axios from "axios";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import {Switch} from "pretty-checkbox-react";
 
 
 
@@ -15,6 +19,9 @@ class UserGroup extends Component{
         super(props);
         this.state = {
             group : [],
+            addUser: false,
+            userToAdd:"",
+            group_id: ""
         }
         this.insertGroup = this.props.uri + insertGroup_uri;
         this.insertedGroup = this.props.uri + getGroup_uri;
@@ -26,6 +33,18 @@ class UserGroup extends Component{
         this.getGroup()
     }
 
+
+    serverConn = (url, payload) =>{
+        axios.post(url, payload)
+            .then(response => {
+                alert(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
     handleAddGroup = () =>{
         let groupName = prompt("Inserisci il nome del gruppo da creare")
         const temp = {
@@ -33,40 +52,28 @@ class UserGroup extends Component{
             "creator": this.props.user
         }
         let payload = JSON.stringify(temp)
-        axios.post(this.insertGroup, payload)
-            .then(response => {
-               alert(response.data)
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        this.serverConn(this.insertGroup, payload)
+        this.getGroup()
     }
 
-    handleAddUser = () =>{
-        for(let i =0 ; i<this.state.group.length; i++){
-            console.log(i)
-            console.log(this.state.group[i].name)
-        }
-        let group = prompt("Inserisci numero del gruppo")
-        let user = prompt("Inserisci il nome dell'utente")
-        const id_group = (JSON.stringify(this.state.group[group]._id))
-        const a = id_group.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-        console.log(a)
+
+    handleUserAdd = () =>{
+        let a = JSON.stringify(this.state.group_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
         const temp = {
             "id": this.props.user,
-            "user": user,
+            "user": this.state.userToAdd,
             "group": a.toString()
         }
         const payload = JSON.stringify(temp)
-        console.log(payload)
+        this.serverConn(this.insertUserinGroup, payload)
+        this.setState({addUser: false})
+        this.getGroup()
 
-        axios.post(this.insertUserinGroup, payload)
-            .then(response => {
-                alert(response.data)
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+    }
+
+
+    handleAddUser = () =>{
+        this.setState({addUser: !this.state.addUser})
     }
 
 
@@ -87,10 +94,18 @@ class UserGroup extends Component{
     }
 
 
+
     render(){
+        const setName = (e) =>{
+            this.setState({userToAdd: e.target.value})
+        }
+
+        const updateGroup = (e) =>{
+            this.setState({group_id: e.target.value})
+        }
+
         return(
             <div>
-                Hi, I'm the USerGroup class
                 <p>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi un gruppo" onClick={this.handleAddGroup} />
@@ -98,8 +113,47 @@ class UserGroup extends Component{
                     <input type="submit" value="Aggiungi utente al gruppo" onClick={this.handleAddUser} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Torna indietro" onClick={this.backToCal} />
-
                 </p>
+
+
+
+                {
+                    (this.state.addUser)?
+                        <div>
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <TextField
+                                    label="Nome dell'utente"
+                                    onChange={setName}
+                                />
+                            </p>
+
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label>Nome del gruppo</label>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <Select
+                                onChange={updateGroup}
+                                defaultValue={""}
+                            >
+                                {
+                                    this.state.group.map((item, index) => {
+                                        return (
+                                            <MenuItem key={index} id={index} value={item._id} onChange={updateGroup}>
+                                                {item.name}
+                                            </MenuItem>
+                                        )
+                                    })
+                                }
+                            </Select>
+                            </p>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Aggiungi l'utente al gruppo" onClick={this.handleUserAdd} />
+                        </div>
+                        :
+                        <p>
+                        </p>
+                }
             </div>
         )
 
