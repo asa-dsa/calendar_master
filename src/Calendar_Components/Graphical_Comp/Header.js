@@ -4,7 +4,7 @@ import {Switch} from "pretty-checkbox-react";
 import jwtDecode from "jwt-decode";
 
 const getAllCal_uri = "/user_cal"
-
+const insertCal_uri = "/insert_cal"
 
 class Header extends Component{
 
@@ -15,7 +15,7 @@ class Header extends Component{
             params: [],
         }
         this.get_calendar_names_uri = this.props.uri + getAllCal_uri;
-
+        this.createCal_URL = this.props.uri + insertCal_uri
     }
 
     componentDidMount(){
@@ -58,14 +58,33 @@ class Header extends Component{
             this.props.handler(this.state.params)
         }
 
+
+
         const handleAddCal = () => {
-           let calendarName = prompt("Nome del calendario")
-            console.log(calendarName)
-            console.log(this.props.owner)
+            let calendarName = prompt("Nome del calendario")
+            let xor = prompt("Calendario esclusivo?", "No")
+            const temp = {
+                "type": calendarName,
+                "xor": (!(xor==="No")).toString(),
+                "owner": jwtDecode(sessionStorage.getItem('token')).id
+            }
+            let payload = JSON.stringify(temp)
+            axios.post(this.createCal_URL, payload)
+                .then(response => {
+                    alert(response.data)
+                    window.location.reload()
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
 
         const handleAddPre= () => {
             this.props.handlerPre(false)
+        }
+
+        const handleAddUserGroup = () => {
+            this.props.handlerUG(false)
         }
 
         const handleAddAut = () => {
@@ -89,6 +108,9 @@ class Header extends Component{
 
                     <p align="center">
                         <input type="submit" value="Aggiungi un calendario" onClick={handleAddCal} />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
+                        <input type="submit" value="Gestisci utenti e gruppi" onClick={handleAddUserGroup} />
                         &nbsp;&nbsp;&nbsp;&nbsp;
 
                         <input type="submit" value="Aggiungi precondizione temporale" onClick={handleAddPre} />

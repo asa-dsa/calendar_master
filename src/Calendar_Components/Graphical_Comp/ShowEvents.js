@@ -5,8 +5,6 @@ import {CirclePicker} from "react-color";
 import Switch from "@material-ui/core/Switch";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 
 
 const noMoreProps = 9
@@ -23,7 +21,6 @@ class ShowEvents extends Component{
         this.state = {
             event: this.props.event,
             updateView: true,
-            calendar_names: this.props.calendars,
             error: false,
             user: this.props.user
         }
@@ -36,7 +33,6 @@ class ShowEvents extends Component{
 
     render(){
         let copy_event = this.state.event
-        const {calendar_names} = this.state;
 
 
         const backToCal =() => {
@@ -52,8 +48,7 @@ class ShowEvents extends Component{
             copy_event.start = new Date(this.state.event.start).valueOf()
             copy_event.end = new Date(this.state.event.end).valueOf()
             const a = JSON.stringify(this.state.event._id)
-            const user_id = a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-            copy_event._id = user_id
+            copy_event._id =  a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
             this.setState({event: copy_event})
 
         }
@@ -69,6 +64,12 @@ class ShowEvents extends Component{
             return value
         }
 
+        const wrapper =() => {
+            copy_event.calendar = this.props.calendar_id
+            this.setState({event: copy_event})
+            addUpdatedData()
+        }
+
         const addUpdatedData =() => {
             if(this.state.error)
                 alert("Errore nell'inserimento della data di fine evento; data di fine evento impostata a " + this.state.event.end)
@@ -76,7 +77,7 @@ class ShowEvents extends Component{
             const temp_payload = JSON.stringify(this.state.event, replacer)
             const a = JSON.stringify({"username": this.state.user})
             let payload = (temp_payload.concat(a)).replace("}{", ",")
-
+            console.log(payload)
             axios.post(this.updateURL, payload)
                 .then(response => {
                     console.log(response.data)
@@ -85,8 +86,7 @@ class ShowEvents extends Component{
                 .catch(function (error) {
                     console.log(error);
                 });
-            //N.B. date non aggiornabili - se aggiornabili, dividi per mille
-            //backToCal()
+            backToCal()
         }
 
         const updateStartDate = (e) => {
@@ -289,7 +289,7 @@ class ShowEvents extends Component{
 
                 <p><Button variant="contained" onClick={updateData}>Modifica l'evento</Button>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <Button variant="contained" onClick={addUpdatedData} disabled={this.state.updateView}>Salva l'evento modificato</Button></p>
+                <Button variant="contained" onClick={wrapper} disabled={this.state.updateView}>Salva l'evento modificato</Button></p>
                 <p><Button variant="contained" onClick={deleteEvent}>Cancella l'evento</Button></p>
                 <p><Button variant="contained" onClick={backToCalNoUpd}>Torna al calendario</Button></p>
                 </div>

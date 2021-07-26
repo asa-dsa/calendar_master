@@ -22,6 +22,7 @@ import ShowEvents from "./Graphical_Comp/ShowEvents"
 
 import jwtDecode from "jwt-decode";
 import {Redirect} from "react-router-dom";
+import UserGroup from "./Graphical_Comp/UserGroup";
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
@@ -43,6 +44,7 @@ class CalendarPopup extends Component {
             eventView: true,
             authView: true,
             preView: true,
+            userGroup: true,
             startTime: 0,
             endTime: 0,
             eventToShow: "",
@@ -57,6 +59,7 @@ class CalendarPopup extends Component {
         this.handlerAuthView = this.handlerAuthView.bind(this)
         this.handlerPreView = this.handlerPreView.bind(this)
         this.handlerEventViews_withRefresh = this.handlerEventViews_withRefresh.bind(this)
+        this.handleUserGroup = this.handleUserGroup.bind(this)
 
     }
 
@@ -95,6 +98,11 @@ class CalendarPopup extends Component {
         this.setState({preView: data})
     }
 
+    handleUserGroup = (data) =>{
+        this.setState({userGroup: data})
+    }
+
+
     handlerAddEvents = () => {
         this.setState({eventAddView: true})
         this.setState({events:[]})
@@ -119,7 +127,7 @@ class CalendarPopup extends Component {
                 //console.log(response.data)
                 let actual_events = this.state.events.map(item => ({...item}))
                 let actual_size = actual_events.length
-
+                console.log(response.data)
                 for(let i=0; i< response.data.length; i++)
                     actual_events[actual_size++] = response.data[i]
                 this.setState(state => ({
@@ -164,8 +172,9 @@ class CalendarPopup extends Component {
 
     //9 elements; from the 9-th element, they are all extra props (to 5 - max limit)
     handleClickedEvent  = (e) => {
+        const temp = e.calendar
         e.calendar = (this.getCalName(e.calendar))
-        this.setState({eventToShow: e, eventView:false})
+        this.setState({eventToShow: e, eventView:false, calendar_id: temp})
     }
 
     render(){
@@ -196,14 +205,19 @@ class CalendarPopup extends Component {
                                 <div>
                                     <Authorization handlerViews={this.handlerAuthView} uri={default_uri}/>
                                 </div>
+                                :
+                                (!this.state.userGroup)?
+                                    <div>
+                                        <UserGroup user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handleUserGroup} uri={default_uri}/>
+                                    </div>
                 :
                     (!this.state.eventView)?
                         <div>
-                            <ShowEvents user={jwtDecode(sessionStorage.getItem('token')).id} calendars={this.state.calendar_names} handlernoUpd={this.handlerEventViews_withRefresh} handlerViews={this.handlerEventViews} uri={default_uri} event={this.state.eventToShow}/>
+                            <ShowEvents calendar_id={this.state.calendar_id} user={jwtDecode(sessionStorage.getItem('token')).id} handlernoUpd={this.handlerEventViews_withRefresh} handlerViews={this.handlerEventViews} uri={default_uri} event={this.state.eventToShow}/>
                         </div>
                         :
                         <div>
-                            <Header handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri}/>
+                            <Header handlerUG={this.handleUserGroup} handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri}/>
                             <Calendar
                                 popup
                                 selectable

@@ -126,7 +126,7 @@ class FormClass extends Component{
 
         const handlePropAdding = () =>{
             showProp[lastInserted++] = true
-            this.setState({[this.prop_temp]:this.value_temp})
+            this.setState({[this.prop_temp.toLowerCase()]:this.value_temp})
         }
 
         let timezone_off = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
@@ -262,9 +262,9 @@ class FormClass extends Component{
                         </p>
                     :<p></p>
                     }
-
-                    <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
                     <p><Button variant="contained" onClick={onSend}>Aggiungi evento</Button></p>
+                    <p><Button variant="contained" onClick={backToCal}>Torna al calendario</Button></p>
+
                 </div>
         );
     }
