@@ -127,10 +127,9 @@ class CalendarPopup extends Component {
                 //console.log(response.data)
                 let actual_events = this.state.events.map(item => ({...item}))
                 let actual_size = actual_events.length
-                console.log(response.data)
                 for(let i=0; i< response.data.length; i++)
                     actual_events[actual_size++] = response.data[i]
-                this.setState(state => ({
+                this.setState(() => ({
                     events :actual_events
                 }))
             })
@@ -237,7 +236,7 @@ class CalendarPopup extends Component {
                                 defaultDate={new Date()}
                                 defaultView={"week"}
                                 onSelectEvent={this.handleClickedEvent}
-                                onDoubleClickEvent={event => alert("Modifica/Cancellazione evento")}
+                                onDoubleClickEvent={() => alert("Modifica/Cancellazione evento")}
                                 onSelectSlot={this.handleSelect}
                                 style={{height: "100vh"}}
                                 eventPropGetter={event => {

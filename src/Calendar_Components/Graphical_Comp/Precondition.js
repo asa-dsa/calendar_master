@@ -7,14 +7,15 @@ import {Switch} from "pretty-checkbox-react";
 
 const getGroup_uri = "/list_created_group"
 
+
+const days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+
 class Precondition extends Component{
 
     constructor(props) {
         super(props);
         this.state = {
             repetition: false,
-            start:(new Date()).valueOf(),
-            end: (new Date()).valueOf(),
             group: []
         }
         this.insertedGroup = this.props.uri + getGroup_uri;
@@ -67,6 +68,7 @@ class Precondition extends Component{
 
 
         const handlePre = () => {
+            console.log(this.state)
             let payload = ""
             JSON.stringify(payload, replacer)
 
@@ -78,6 +80,25 @@ class Precondition extends Component{
 
         const updateEndDate = (e) => {
             this.setState({end: (new Date(e.target.value).valueOf)})
+        }
+
+        const updateStartHour = (e) =>{
+            this.setState({startHour: e.target.value})
+
+        }
+
+        const updateEndHour = (e) =>{
+            this.setState({endHour: e.target.value})
+
+        }
+
+        const updateStartDay = (e) =>{
+            this.setState({startDay: e.target.value})
+
+        }
+
+        const updateEndDay = (e) =>{
+            this.setState({endDay: e.target.value})
         }
 
 
@@ -138,7 +159,7 @@ class Precondition extends Component{
                                 id="datetime-start"
                                 label="Data e ora di inizio della precondizione"
                                 type="datetime-local"
-                                defaultValue={(new Date()).toISOString().slice(0,-1).substring(0,16)}
+                                defaultValue=""
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -151,7 +172,7 @@ class Precondition extends Component{
                                 id="datetime-end"
                                 label="Data e ora di fine della precondizione"
                                 type="datetime-local"
-                                defaultValue={(new Date()).toISOString().slice(0,-1).substring(0,16)}
+                                defaultValue=""
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
@@ -164,24 +185,84 @@ class Precondition extends Component{
                         <p>
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         <label>Giorno di inizio</label>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>Giorno di fine</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Select
+                        onChange={updateStartDay}
+                        defaultValue={""}
+                        >
+                        {
+                            days.map((item, index) => {
+                                return (
+                                    <MenuItem key={index} id={index} value={index} onChange={updateStartDay}>
+                                        {item}
+                                    </MenuItem>
+                                )
+                            })
+                        }
+                        </Select>
                         </p>
+
                         <p>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>Ora di inizio</label>
+                        <label>Giorno di fine</label>
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>Ora di fine</label>
+                        <Select
+                            onChange={updateEndDay}
+                            defaultValue={""}
+                        >
+                            {
+                                days.map((item, index) => {
+                                    return (
+                                        <MenuItem key={index} id={index} value={index} onChange={updateEndDay}>
+                                            {item}
+                                        </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+
+                        </p>
+                        <p>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <TextField
+                                id="timestart"
+                                label="Ora di inizio"
+                                type="time"
+                                defaultValue=""
+                                onChange={updateStartHour}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                inputProps={{
+                                    step: 300, // 5 min
+                                }}
+                            />
+                        </p>
+                        <p>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <TextField
+                                id="timeend"
+                                label="Ora fine"
+                                type="time"
+                                defaultValue=""
+                                onChange={updateEndHour}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                inputProps={{
+                                    step: 300, // 5 min
+                                }}
+                            />
                         </p>
                     </div>
                 }
 
 
-                &nbsp;&nbsp;&nbsp;&nbsp;
-
                 <p>
-                <input type="submit" value="Aggiungi pre" onClick={handlePre} />
-                <input type="submit" value="Torna indietro" onClick={this.backToCal} />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="submit" value="Aggiungi pre" onClick={handlePre} />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
             </div>
         )

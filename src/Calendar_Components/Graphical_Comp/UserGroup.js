@@ -3,7 +3,6 @@ import axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import {Switch} from "pretty-checkbox-react";
 
 
 

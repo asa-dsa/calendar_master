@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@mapbox/react-colorpickr": "^9.0.0",
+    "@material-ui/pickers": "^3.3.10",
     "globalize": "^0.1.1"
   }
 }
