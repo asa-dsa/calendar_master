@@ -197,12 +197,12 @@ class CalendarPopup extends Component {
                         :
                         (!this.state.preView)?
                             <div>
-                                <Precondition  user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handlerPreView}  uri={default_uri}/>
+                                <Precondition user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handlerPreView} uri={default_uri}/>
                             </div>
                             :
                             (!this.state.authView)?
                                 <div>
-                                    <Authorization handlerViews={this.handlerAuthView} uri={default_uri}/>
+                                    <Authorization user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handlerAuthView} uri={default_uri}/>
                                 </div>
                                 :
                                 (!this.state.userGroup)?

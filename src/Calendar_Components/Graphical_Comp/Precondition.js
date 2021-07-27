@@ -6,7 +6,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {Switch} from "pretty-checkbox-react";
 
 const getGroup_uri = "/list_created_group"
-
+const getCal_uri ="/list_cal_owner"
+const precond_uri ="/precondition"
 
 const days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
@@ -16,14 +17,18 @@ class Precondition extends Component{
         super(props);
         this.state = {
             repetition: false,
-            group: []
+            group: [],
+            calendar: []
         }
         this.insertedGroup = this.props.uri + getGroup_uri;
+        this.getCalURL = this.props.uri + getCal_uri;
+        this.insertPre = this.props.uri + precond_uri;
 
     }
 
     componentDidMount() {
         this.getGroup()
+        this.getCal()
     }
 
 
@@ -44,13 +49,26 @@ class Precondition extends Component{
             });
     }
 
+    getCal = () =>{
+        let payload = { id: this.props.user};
+        axios.post(this.getCalURL, payload)
+            .then(response => {
+                this.setState({calendar: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
     handleRep = () =>{
         this.setState({repetition: !this.state.repetition})
     }
 
     render(){
         const updateGroup = (e) =>{
-            this.setState({group_id: e.target.value})
+            let group_id = JSON.stringify(e.target.value).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+            this.setState({group_id: group_id})
         }
 
         function replacer(key, value) {
@@ -62,33 +80,65 @@ class Precondition extends Component{
             return value
         }
 
-        const updateCal = () =>{
-
+        const updateCal = (e) =>{
+            let cal_id = JSON.stringify(e.target.value).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+            this.setState({calendar_id: cal_id})
         }
 
 
         const handlePre = () => {
-            console.log(this.state)
-            let payload = ""
-            JSON.stringify(payload, replacer)
-
+            let payload = {}
+            if(this.state.repetition) {
+                payload = {
+                    creator: this.props.user,
+                    group_id: this.state.group_id,
+                    calendar_id: this.state.calendar_id,
+                    repetition: this.state.repetition,
+                    startDay: this.state.startDay,
+                    startHour: this.state.startHour,
+                    startMin: this.state.startMin,
+                    endDay: this.state.endDay,
+                    endHour: this.state.endHour,
+                    endMin: this.state.endMin
+                }
+            }else{
+                payload = {
+                    creator: this.props.user,
+                    group_id: this.state.group_id,
+                    calendar_id: this.state.calendar_id,
+                    repetition: this.state.repetition,
+                    start: this.state.start,
+                    end: this.state.end,
+                }
+            }
+            axios.post(this.insertPre, JSON.stringify(payload, replacer))
+                .then(response => {
+                    alert(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
 
         const updateStartDate = (e) => {
-            this.setState({start: (new Date(e.target.value).valueOf)})
+            this.setState({start: (new Date(e.target.value)).valueOf()})
         }
 
         const updateEndDate = (e) => {
-            this.setState({end: (new Date(e.target.value).valueOf)})
+            this.setState({end: (new Date(e.target.value)).valueOf()})
         }
 
         const updateStartHour = (e) =>{
-            this.setState({startHour: e.target.value})
+            let arr = (e.target.value).split(":")
+            this.setState({startHour: arr[0]})
+            this.setState({startMin: arr[1]})
 
         }
 
         const updateEndHour = (e) =>{
-            this.setState({endHour: e.target.value})
+            let arr = (e.target.value).split(":")
+            this.setState({endHour: arr[0]})
+            this.setState({endMin: arr[1]})
 
         }
 
@@ -133,13 +183,13 @@ class Precondition extends Component{
                     defaultValue={""}
                 >
                     {
-                        /*this.state.group.map((item, index) => {
+                        this.state.calendar.map((item, index) => {
                             return (
                                 <MenuItem key={index} id={index} value={item._id} onChange={updateCal}>
-                                    {item.name}
+                                    {item.type}
                                 </MenuItem>
                             )
-                        })*/
+                        })
                     }
                 </Select>
             </p>
@@ -220,7 +270,6 @@ class Precondition extends Component{
                                 })
                             }
                         </Select>
-
                         </p>
                         <p>
                             &nbsp;&nbsp;&nbsp;&nbsp;

@@ -8,7 +8,7 @@ import Select from "@material-ui/core/Select";
 
 const insertGroup_uri = "/insert_group"
 const getGroup_uri = "/list_created_group"
-const insertUserGruop = "/insert_user_group"
+const insertUserGroup = "/insert_user_group"
 
 class UserGroup extends Component{
 
@@ -24,8 +24,7 @@ class UserGroup extends Component{
         }
         this.insertGroup = this.props.uri + insertGroup_uri;
         this.insertedGroup = this.props.uri + getGroup_uri;
-        this.insertUserinGroup = this.props.uri + insertUserGruop;
-
+        this.insertUserinGroup = this.props.uri + insertUserGroup;
     }
 
     componentDidMount() {
