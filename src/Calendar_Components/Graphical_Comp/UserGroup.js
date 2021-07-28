@@ -110,6 +110,8 @@ class UserGroup extends Component{
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi utente al gruppo" onClick={this.handleAddUser} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="submit" value="Aggiungi (e rimuovi) gruppo a gerarchia"  />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
 

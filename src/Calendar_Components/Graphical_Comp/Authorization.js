@@ -41,7 +41,6 @@ class Authorization extends Component{
 
     //gruppo creato dall'utente loggato al momento (id), calendar (id), typo = (any, Ti, Ei), prop (null), tipo (freeBusy, read e write) e segno
 
-
     handleAddAuth = () =>{
         let res = {
             creator: this.props.user,
@@ -61,11 +60,12 @@ class Authorization extends Component{
         let payload = (JSON.stringify(res).concat(temp)).replace("}{", ",")
         axios.post(this.addAuthURL, payload)
             .then(response => {
-                console.log(response.data)
+                alert(response.data)
             })
             .catch(function (error) {
                 console.log(error);
             });
+        this.backToCal()
 
     }
 

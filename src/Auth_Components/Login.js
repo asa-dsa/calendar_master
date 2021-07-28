@@ -1,7 +1,9 @@
 import React from "react";
 import {Redirect} from "react-router-dom";
+import jwtDecode from "jwt-decode";
+import axios from "axios";
 
-
+const loginURL = "http://192.168.188.79:12345/insert_user"
 export class Login extends React.Component {
 
     constructor(props) {
@@ -13,6 +15,17 @@ export class Login extends React.Component {
         }
     }
 
+
+    insertUser() {
+        let payload = { _id: jwtDecode(sessionStorage.getItem('token')).id, username: jwtDecode(sessionStorage.getItem('token')).username};
+        axios.post(loginURL, payload)
+            .then(response => {
+                console.log(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 
 
     render() {
@@ -35,17 +48,19 @@ export class Login extends React.Component {
 
 
             if (result.status === 'ok') {
-                // everythign went fine
                 console.log('Got the token: ', result.data)
                 sessionStorage.setItem('token', result.data)
                 alert('Login completato con successo\nBenvenuto ' + username + "!")
                 this.props.auth(username)
                 this.setState({authenticated: true})
+                this.insertUser()
             } else {
                 alert(result.error)
             }
 
         }
+
+
 
         const handleRegister = () =>{
             this.setState({register: true})
@@ -67,7 +82,6 @@ export class Login extends React.Component {
                     :
                     <form>
                         <h3>Accesso</h3>
-
                         <div className="form-group">
                             <label>Username</label>
                             <input type="email" className="form-control" onChange={setName} placeholder="Inserisci indirizzo email" />

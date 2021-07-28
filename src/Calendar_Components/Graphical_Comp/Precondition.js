@@ -118,6 +118,8 @@ class Precondition extends Component{
                 .catch(function (error) {
                     console.log(error);
                 });
+            this.backToCal()
+
         }
 
         const updateStartDate = (e) => {
