@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useState} from "react";
 import axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -9,6 +9,8 @@ import Select from "@material-ui/core/Select";
 const insertGroup_uri = "/insert_group"
 const getGroup_uri = "/list_created_group"
 const insertUserGroup = "/insert_user_group"
+const image = "/image"
+
 
 class UserGroup extends Component{
 
@@ -19,8 +21,11 @@ class UserGroup extends Component{
         this.state = {
             group : [],
             addUser: false,
+            showH: false,
             userToAdd:"",
-            group_id: ""
+            group_id: "",
+            base64: "",
+            imageURL: this.props.uri + image
         }
         this.insertGroup = this.props.uri + insertGroup_uri;
         this.insertedGroup = this.props.uri + getGroup_uri;
@@ -74,6 +79,10 @@ class UserGroup extends Component{
         this.setState({addUser: !this.state.addUser})
     }
 
+    handleHier = () => {
+        this.setState({showH: true})
+    }
+
 
     getGroup = () =>{
         let payload = { id: this.props.user};
@@ -87,6 +96,7 @@ class UserGroup extends Component{
     }
 
     backToCal = () =>{
+        window.location.reload()
         this.props.handlerViews(true)
 
     }
@@ -110,11 +120,21 @@ class UserGroup extends Component{
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi utente al gruppo" onClick={this.handleAddUser} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Aggiungi (e rimuovi) gruppo a gerarchia"  />
+                    <input type="submit" value="Aggiungi (e rimuovi) gruppo a gerarchia" onClick={this.handleHier} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
 
+
+                {
+                    (this.state.showH)?
+                        <p>
+                            <img src={this.state.imageURL +"?user="+this.props.user} />
+                        </p>
+                        :
+                        <p>
+                        </p>
+                }
 
 
                 {
