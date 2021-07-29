@@ -4,6 +4,7 @@ import Login from "./Auth_Components/Login"
 import Register from "./Auth_Components/Register"
 
 import { BrowserRouter, Route, Redirect} from 'react-router-dom';
+import jwtDecode from "jwt-decode";
 
 
 const authServerUri = 'http://192.168.188.77:9999'
@@ -33,9 +34,10 @@ export class App extends React.Component {
         return (
             <div className="App">
                 <h2>
-                    <center>Calendario AM - SS </center></h2>
+                    <center>Calendario AM - SS  </center></h2>
                     {(this.state.authenticated) ?
                         <p>
+                            <center>{jwtDecode(sessionStorage.getItem('token')).username} </center>
                         <center> <button type="submit" className="btn btn-primary btn-block" onClick={this.handleLogOut}>Log
                             out</button>
                         </center>

@@ -10,6 +10,7 @@ const insertGroup_uri = "/insert_group"
 const getGroup_uri = "/list_created_group"
 const insertUserGroup = "/insert_user_group"
 const image = "/image"
+const addHier = "/add_group_hier"
 
 
 class UserGroup extends Component{
@@ -25,11 +26,13 @@ class UserGroup extends Component{
             userToAdd:"",
             group_id: "",
             base64: "",
+            dad: "ANY",
             imageURL: this.props.uri + image
         }
         this.insertGroup = this.props.uri + insertGroup_uri;
         this.insertedGroup = this.props.uri + getGroup_uri;
         this.insertUserinGroup = this.props.uri + insertUserGroup;
+        this.insertHier = this.props.uri + addHier
     }
 
     componentDidMount() {
@@ -51,7 +54,7 @@ class UserGroup extends Component{
     handleAddGroup = () =>{
         let groupName = prompt("Inserisci il nome del gruppo da creare")
         const temp = {
-            "name": groupName,
+            "name": groupName.toUpperCase(),
             "creator": this.props.user
         }
         let payload = JSON.stringify(temp)
@@ -80,7 +83,7 @@ class UserGroup extends Component{
     }
 
     handleHier = () => {
-        this.setState({showH: true})
+        this.setState({showH: !this.state.showH})
     }
 
 
@@ -101,7 +104,20 @@ class UserGroup extends Component{
 
     }
 
-
+    handleAddHier = () =>{
+        if(this.state.son===this.state.dad)
+            alert("Errore")
+        else {
+            const temp = {
+                "id": this.props.user,
+                "dad": this.state.dad,
+                "son": this.state.son
+            }
+            let payload = JSON.stringify(temp)
+            this.serverConn(this.insertHier, payload)
+        }
+        this.backToCal()
+    }
 
     render(){
         const setName = (e) =>{
@@ -112,6 +128,14 @@ class UserGroup extends Component{
             this.setState({group_id: e.target.value})
         }
 
+        const updateDad = (e) =>{
+            this.setState({dad: e.target.value})
+        }
+
+        const updateSon = (e) =>{
+            this.setState({son: e.target.value})
+        }
+
         return(
             <div>
                 <p>
@@ -120,7 +144,7 @@ class UserGroup extends Component{
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi utente al gruppo" onClick={this.handleAddUser} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Aggiungi (e rimuovi) gruppo a gerarchia" onClick={this.handleHier} />
+                    <input type="submit" value="Aggiungi (e rimuovi) gruppo dalla gerarchia" onClick={this.handleHier} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
@@ -128,12 +152,48 @@ class UserGroup extends Component{
 
                 {
                     (this.state.showH)?
-                        <p>
+                        <div><p>
                             <img src={this.state.imageURL +"?user="+this.props.user} />
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label>Padre</label>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <Select
+                                    onChange={updateDad}
+                                    defaultValue={""}
+                                >
+                                    {
+                                        this.state.group.map((item, index) => {
+                                            return (
+                                                <MenuItem key={index} id={index} value={item.name} onChange={updateDad}>
+                                                    {item.name}
+                                                </MenuItem>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <label>Figlio</label>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <Select
+                                    onChange={updateSon}
+                                    defaultValue={""}
+                                >
+                                    {
+                                        this.state.group.map((item, index) => {
+                                            return (
+                                                <MenuItem key={index} id={index} value={item.name} onChange={updateSon}>
+                                                    {item.name}
+                                                </MenuItem>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Aggiungi il gruppo alla gerarchia" onClick={this.handleAddHier} />
                         </p>
+                        </div>
                         :
-                        <p>
-                        </p>
+                        <p></p>
                 }
 
 
