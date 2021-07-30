@@ -8,6 +8,8 @@ import {Switch} from "pretty-checkbox-react";
 const getGroup_uri = "/list_created_group"
 const getCal_uri ="/list_cal_owner"
 const precond_uri ="/precondition"
+const getpreuri ="/list_pre"
+const deletepre ="/delete_pre"
 
 const days = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 
@@ -18,17 +20,22 @@ class Precondition extends Component{
         this.state = {
             repetition: false,
             group: [],
-            calendar: []
+            calendar: [],
+            showAuth: false,
+            showAdd: false
         }
         this.insertedGroup = this.props.uri + getGroup_uri;
         this.getCalURL = this.props.uri + getCal_uri;
         this.insertPre = this.props.uri + precond_uri;
+        this.getAllPreURL =  this.props.uri + getpreuri;
+        this.deletePre = this.props.uri + deletepre;
 
     }
 
     componentDidMount() {
         this.getGroup()
         this.getCal()
+        this.getAllPre()
     }
 
 
@@ -37,6 +44,14 @@ class Precondition extends Component{
     }
 
 
+    handleShow = () =>{
+        this.setState({showAuth: !this.state.showAuth})
+
+    }
+
+    handleAdd = () =>{
+        this.setState({showAdd: !this.state.showAdd})
+    }
 
     getGroup = () =>{
         let payload = { id: this.props.user};
@@ -60,6 +75,46 @@ class Precondition extends Component{
             });
     }
 
+    getAllPre = () =>{
+        let payload = { id: this.props.user};
+        axios.post(this.getAllPreURL, payload)
+            .then(response => {
+                this.setState({pre: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
+    getGroupName = (group_id) =>{
+        let name = ""
+        if(this.state.group.length){
+            this.state.group.map((item, index) => {
+                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                if(id === group_id) {
+                    console.log(item.name)
+                    name = item.name
+                }
+            })
+        }
+        return name
+    }
+
+
+    getCalName = (cal_id) =>{
+        let name = ""
+        if(this.state.calendar.length){
+            this.state.calendar.map((item, index) => {
+                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                if(id === cal_id) {
+                    console.log(item.type)
+                    name = item.type
+                }
+            })
+        }
+        return name
+    }
 
     handleRep = () =>{
         this.setState({repetition: !this.state.repetition})
@@ -153,129 +208,160 @@ class Precondition extends Component{
             this.setState({endDay: e.target.value})
         }
 
+        const deletePre = (e) =>{
+            const esito = (prompt("Sei sicuro di voler cancellare la precondizione?", "No")).toUpperCase()
+            if(esito === "SI") {
+                let temp_id = (this.state.pre[e.target.value]._id)
+                let auth_id = JSON.stringify(temp_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                this.setState({pre_to_del: auth_id})
+                let payload = ({"pre_id":auth_id})
+                axios.post(this.deletePreURL, payload)
+                    .then(response => {
+                        alert(response.data)
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                this.backToCal()
+                this.getAllPre()
+            }else
+                alert("Cancellazione annullata con successo")
+        }
 
         return(
             <div>
                 <p>
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <label>Nome del gruppo</label>
+                    <input type="submit" value="Aggiungi pre" onClick={this.handleAdd} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <Select
-                        onChange={updateGroup}
-                        defaultValue={""}
-                    >
-                        {
-                            this.state.group.map((item, index) => {
-                                return (
-                                    <MenuItem key={index} id={index} value={item._id} onChange={updateGroup}>
-                                        {item.name}
-                                    </MenuItem>
-                                )
-                            })
-                        }
-                    </Select>
-                </p>
-
-                <p>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <label>Nome del calendario</label>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <Select
-                    onChange={updateCal}
-                    defaultValue={""}
-                >
-                    {
-                        this.state.calendar.map((item, index) => {
-                            return (
-                                <MenuItem key={index} id={index} value={item._id} onChange={updateCal}>
-                                    {item.type}
-                                </MenuItem>
-                            )
-                        })
-                    }
-                </Select>
-            </p>
-
-                <p>
+                    <input type="submit" value="Lista pre inserite" onClick={this.handleShow} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <Switch onChange={this.handleRep}>
-                    Ripetizione
-                </Switch>
+                    <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
                 {
-                    !(this.state.repetition)?
-                    <div>
+                    (this.state.showAdd) ?
+                        <div>
                         <p>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <TextField
+                            <label>Nome del gruppo</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <Select
+                                onChange={updateGroup}
+                                defaultValue={""}
+                            >
+                                {
+                                    this.state.group.map((item, index) => {
+                                        return (
+                                            <MenuItem key={index} id={index} value={item._id} onChange={updateGroup}>
+                                                {item.name}
+                                            </MenuItem>
+                                        )
+                                    })
+                                }
+                            </Select>
+                        </p>
+
+                        <p>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <label>Nome del calendario</label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Select
+                        onChange={updateCal}
+                        defaultValue={""}
+                        >
+                        {
+                            this.state.calendar.map((item, index) => {
+                            return (
+                                <MenuItem key={index} id={index} value={item._id} onChange={updateCal}>
+                                {item.type}
+                            </MenuItem>
+                            )
+                        })
+                        }
+                        </Select>
+                        </p>
+
+                        <p>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <Switch onChange={this.handleRep}>
+                        Ripetizione
+                        </Switch>
+                        </p>
+                        {
+                            !(this.state.repetition)?
+                                <div>
+                                <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <TextField
                                 id="datetime-start"
                                 label="Data e ora di inizio della precondizione"
                                 type="datetime-local"
                                 defaultValue=""
                                 InputLabelProps={{
-                                    shrink: true,
+                                shrink: true,
                                 }}
                                 onChange={updateStartDate}
-                            />
-                        </p>
-                        <p>
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <TextField
+                                />
+                                </p>
+                                <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <TextField
                                 id="datetime-end"
                                 label="Data e ora di fine della precondizione"
                                 type="datetime-local"
                                 defaultValue=""
                                 InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                shrink: true,
+                                 }}
                                 onChange={updateEndDate}
-                            />
-                        </p>
-                    </div>
-                    :
-                    <div>
-                        <p>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>Giorno di inizio</label>
+                                />
+                                </p>
+                            </div>
+                            :
+                            <div>
+                            <p>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                        <Select
-                        onChange={updateStartDay}
-                        defaultValue={""}
-                        >
-                        {
-                            days.map((item, index) => {
-                                return (
-                                    <MenuItem key={index} id={index} value={index} onChange={updateStartDay}>
-                                        {item}
-                                    </MenuItem>
-                                )
-                            })
-                        }
-                        </Select>
-                        </p>
-
-                        <p>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <label>Giorno di fine</label>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        <Select
-                            onChange={updateEndDay}
+                            <label>Giorno di inizio</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <Select
+                            onChange={updateStartDay}
                             defaultValue={""}
-                        >
+                            >
                             {
                                 days.map((item, index) => {
-                                    return (
-                                        <MenuItem key={index} id={index} value={index} onChange={updateEndDay}>
-                                            {item}
-                                        </MenuItem>
+                                return (
+                                <MenuItem key={index} id={index} value={index} onChange={updateStartDay}>
+                                    {item}
+                                </MenuItem>
+                                )
+                                })
+                            }
+                            </Select>
+                            </p>
+
+                            <p>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <label>Giorno di fine</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <Select
+                            onChange={updateEndDay}
+                            defaultValue={""}
+                            >
+                            {
+                                days.map((item, index) => {
+                                return (
+                                    <MenuItem key={index} id={index} value={index} onChange={updateEndDay}>
+                                        {item}
+                                    </MenuItem>
                                     )
                                 })
                             }
-                        </Select>
-                        </p>
-                        <p>
+                            </Select>
+                            </p>
+
+                            <p>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <TextField
+                                <TextField
                                 id="timestart"
                                 label="Ora di inizio"
                                 type="time"
@@ -287,11 +373,11 @@ class Precondition extends Component{
                                 inputProps={{
                                     step: 300, // 5 min
                                 }}
-                            />
-                        </p>
-                        <p>
+                                />
+                            </p>
+                            <p>
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <TextField
+                                <TextField
                                 id="timeend"
                                 label="Ora fine"
                                 type="time"
@@ -303,18 +389,34 @@ class Precondition extends Component{
                                 inputProps={{
                                     step: 300, // 5 min
                                 }}
-                            />
-                        </p>
-                    </div>
+                                />
+                            </p>
+                                <p>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="submit" value="Aggiungi pre" onClick={handlePre} />
+                                </p>
+                            </div>
+                        }
+                            </div>
+                    :
+                    (this.state.showAuth) ?
+                        <div>
+                            {
+                                this.state.pre.map((item, index) => {
+                                    return (
+                                    <p>
+                                    <MenuItem key={index} id={index} value={index} onClick={deletePre}>
+                                        Gruppo: {this.getGroupName(item.group_id)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {item.timeslot}&nbsp; Ripetizione: {item.repetition}
+                                    </MenuItem>
+                                    </p>
+                                )
+                                })
+                            }
+                        </div>
+                    :
+                    <p></p>
+
                 }
-
-
-                <p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Aggiungi pre" onClick={handlePre} />
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Torna indietro" onClick={this.backToCal} />
-                </p>
             </div>
         )
 
