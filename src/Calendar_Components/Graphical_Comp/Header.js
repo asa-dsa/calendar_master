@@ -61,7 +61,7 @@ class Header extends Component{
 
 
         const handleAddCal = () => {
-            let calendarName = prompt("Nome del calendario")
+            let calendarName = prompt("Nome del calendario").toUpperCase()
             let xor = prompt("Calendario esclusivo?", "No")
             const temp = {
                 "type": calendarName,
