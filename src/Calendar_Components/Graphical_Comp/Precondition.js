@@ -212,10 +212,10 @@ class Precondition extends Component{
             const esito = (prompt("Sei sicuro di voler cancellare la precondizione?", "No")).toUpperCase()
             if(esito === "SI") {
                 let temp_id = (this.state.pre[e.target.value]._id)
-                let auth_id = JSON.stringify(temp_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                this.setState({pre_to_del: auth_id})
-                let payload = ({"pre_id":auth_id})
-                axios.post(this.deletePreURL, payload)
+                let pre_id = JSON.stringify(temp_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                this.setState({pre_to_del: pre_id})
+                let payload = ({"pre_id":pre_id})
+                axios.post(this.deletePre, payload)
                     .then(response => {
                         alert(response.data)
                     })
