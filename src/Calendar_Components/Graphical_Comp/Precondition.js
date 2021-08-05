@@ -122,8 +122,6 @@ class Precondition extends Component{
 
 
     getTime = (timestamp, repetition) =>{
-        let ret_timestamp = ""
-        console.log(timestamp)
         const temp = timestamp.split("-")
         if(repetition === "false") {
             const date_s = new Date(1000 * temp[0])
