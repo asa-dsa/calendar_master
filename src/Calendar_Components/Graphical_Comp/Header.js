@@ -89,7 +89,10 @@ class Header extends Component{
 
         const handleAddAut = () => {
             this.props.handlerAuth(false)
+        }
 
+        const handleAdminAuth = () =>{
+            this.props.handlerAdmin(false)
         }
 
 
@@ -118,6 +121,10 @@ class Header extends Component{
 
                         <input type="submit" value="Aggiungi autorizzazione" onClick={handleAddAut} />
                         &nbsp;&nbsp;&nbsp;&nbsp;
+
+                        <input type="submit" value="Aggiungi autorizzazione amministrativa" onClick={handleAdminAuth} />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+
                     </p>
 
 

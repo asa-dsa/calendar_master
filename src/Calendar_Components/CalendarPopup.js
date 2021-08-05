@@ -23,6 +23,7 @@ import ShowEvents from "./Graphical_Comp/ShowEvents"
 import jwtDecode from "jwt-decode";
 import {Redirect} from "react-router-dom";
 import UserGroup from "./Graphical_Comp/UserGroup";
+import AdminAuth from "./Graphical_Comp/AdminAuth";
 
 require('globalize/lib/cultures/globalize.culture.it-IT')
 const globalizeLocalize = local(globalize)
@@ -45,6 +46,7 @@ class CalendarPopup extends Component {
             authView: true,
             preView: true,
             userGroup: true,
+            adminAuth: true,
             startTime: 0,
             endTime: 0,
             eventToShow: "",
@@ -60,6 +62,7 @@ class CalendarPopup extends Component {
         this.handlerPreView = this.handlerPreView.bind(this)
         this.handlerEventViews_withRefresh = this.handlerEventViews_withRefresh.bind(this)
         this.handleUserGroup = this.handleUserGroup.bind(this)
+        this.handleAdminAuth = this.handleAdminAuth.bind(this)
 
     }
 
@@ -101,6 +104,11 @@ class CalendarPopup extends Component {
     handleUserGroup = (data) =>{
         this.setState({userGroup: data})
     }
+
+    handleAdminAuth = (data) =>{
+        this.setState({adminAuth: data})
+    }
+
 
 
     handlerAddEvents = () => {
@@ -209,6 +217,11 @@ class CalendarPopup extends Component {
                                     <div>
                                         <UserGroup user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handleUserGroup} uri={default_uri}/>
                                     </div>
+                                :
+                                    (!this.state.adminAuth)?
+                                        <div>
+                                            <AdminAuth user={jwtDecode(sessionStorage.getItem('token')).id} handlerViews={this.handleAdminAuth} uri={default_uri}/>
+                                        </div>
                 :
                     (!this.state.eventView)?
                         <div>
@@ -216,7 +229,7 @@ class CalendarPopup extends Component {
                         </div>
                         :
                         <div>
-                            <Header handlerUG={this.handleUserGroup} handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri}/>
+                            <Header handlerAdmin={this.handleAdminAuth} handlerUG={this.handleUserGroup} handlerAuth={this.handlerAuthView} handlerPre={this.handlerPreView} handler={this.handlerHeader} uri={default_uri}/>
                             <Calendar
                                 popup
                                 selectable
