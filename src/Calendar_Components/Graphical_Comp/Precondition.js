@@ -116,6 +116,32 @@ class Precondition extends Component{
         return name
     }
 
+    addZero = (time) =>{
+         return ((time<10?'0':'') + time).toString()
+    }
+
+
+    getTime = (timestamp, repetition) =>{
+        let ret_timestamp = ""
+        console.log(timestamp)
+        const temp = timestamp.split("-")
+        if(repetition === "false") {
+            const date_s = new Date(1000 * temp[0])
+            const date_e = new Date(1000 * temp[1])
+            const string_date_s = this.addZero(date_s.getDate()) + "/" + this.addZero(date_s.getMonth()) +  "/"+ date_s.getFullYear().toString() + "-" + this.addZero(date_s.getHours())+ ":" + this.addZero(date_s.getMinutes())
+            const string_date_e = this.addZero(date_e.getDate()) + "/" + this.addZero(date_e.getMonth()) +  "/"+ date_e.getFullYear().toString() + "-" + this.addZero(date_e.getHours())+ ":" + this.addZero(date_e.getMinutes())
+            return string_date_s + " - " + string_date_e
+        }
+        else {
+            const temp = timestamp.split("-")
+            let re_temp = temp[0].split(".")
+            const start_string = days[re_temp[0]] + "." + re_temp[1]
+            re_temp = temp[1].split(".")
+            const end_string = days[re_temp[0]] + "." + re_temp[1]
+            return start_string + " - " + end_string
+        }
+    }
+
     handleRep = () =>{
         this.setState({repetition: !this.state.repetition})
     }
@@ -391,13 +417,15 @@ class Precondition extends Component{
                                 }}
                                 />
                             </p>
-                                <p>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <input type="submit" value="Aggiungi pre" onClick={handlePre} />
-                                </p>
+
                             </div>
                         }
+                            <p>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="submit" value="Aggiungi pre" onClick={handlePre} />
+                            </p>
                             </div>
+
                     :
                     (this.state.showAuth) ?
                         <div>
@@ -406,7 +434,7 @@ class Precondition extends Component{
                                     return (
                                     <p>
                                     <MenuItem key={index} id={index} value={index} onClick={deletePre}>
-                                        Gruppo: {this.getGroupName(item.group_id)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {item.timeslot}&nbsp; Ripetizione: {item.repetition}
+                                        Gruppo: {this.getGroupName(item.group_id)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {this.getTime(item.timeslot, item.repetition)}&nbsp; Ripetizione: {item.repetition}
                                     </MenuItem>
                                     </p>
                                 )
