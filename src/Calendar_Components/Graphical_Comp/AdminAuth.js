@@ -7,6 +7,8 @@ import TextField from "@material-ui/core/TextField";
 
 const getCal_uri ="/list_cal_owner"
 const insertPre ="/auth_admin"
+const getAdminPre_uri ="/list_admin_pre"
+const deletePre_uri ="/delete_admin_pre"
 
 
 const del_type = ["DELEGATO_ROOT", "DELEGATO_ADMIN"]
@@ -19,13 +21,67 @@ class AdminAuth extends Component{
         this.state = {
             calendar: [],
             repetition: false,
+            showAuth: false,
+            adminPre: []
         }
         this.getCalURL = this.props.uri + getCal_uri
+        this.getAdminPreURL = this.props.uri + getAdminPre_uri
         this.insertAdminPre = this.props.uri + insertPre
+        this.deletePreURL = this.props.uri + deletePre_uri
+
     }
 
     componentDidMount() {
         this.getCal()
+        this.getPreAdmin()
+
+    }
+
+
+    getPreAdmin = () =>{
+        let payload = { id: this.props.user};
+        axios.post(this.getAdminPreURL, payload)
+            .then(response => {
+                this.setState({adminPre: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    getCalName = (cal_id) =>{
+        let name = ""
+        if(this.state.calendar.length){
+            this.state.calendar.map((item, index) => {
+                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+                if(id === cal_id) {
+                    console.log(item.type)
+                    name = item.type
+                }
+            })
+        }
+        return name
+    }
+
+
+    addZero = (time) =>{
+        return ((time<10?'0':'') + time).toString()
+    }
+
+    getTime = (auth) =>{
+        if(auth.repetition ==="true"){
+            const start_string = days[auth.startDay] + "." + auth.startHour + ":" + auth.startMin
+            const end_string = days[auth.endDay] + "." +  auth.endHour + ":" + auth.endMin
+            return start_string + " - " + end_string
+        }
+        else{
+            const date_s = new Date(1000 * auth.start)
+            const date_e = new Date(1000 * auth.end)
+            const string_date_s = this.addZero(date_s.getDate()) + "/" + this.addZero(date_s.getMonth()) +  "/"+ date_s.getFullYear().toString() + "-" + this.addZero(date_s.getHours())+ ":" + this.addZero(date_s.getMinutes())
+            const string_date_e = this.addZero(date_e.getDate()) + "/" + this.addZero(date_e.getMonth()) +  "/"+ date_e.getFullYear().toString() + "-" + this.addZero(date_e.getHours())+ ":" + this.addZero(date_e.getMinutes())
+            return string_date_s + " - " + string_date_e
+        }
+
     }
 
     getCal = () =>{
@@ -43,10 +99,30 @@ class AdminAuth extends Component{
         this.setState({showAdd: !this.state.showAdd})
     }
 
+    handleShow = () =>{
+        this.setState({showAuth: !this.state.showAuth})
+    }
 
 
-
-
+    deleteAdminPre = (e) =>{
+        const esito = (prompt("Sei sicuro di voler cancellare l'autorizzazione?", "No")).toUpperCase()
+        if(esito === "SI") {
+            let temp_id = (this.state.adminPre[e.target.value]._id)
+            let pre_id = JSON.stringify(temp_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+            this.setState({pre_to_del: pre_id})
+            let payload = ({"pre_id":pre_id})
+            axios.post(this.deletePreURL, payload)
+                .then(response => {
+                    alert(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            this.backToCal()
+            this.getPreAdmin()
+        }else
+            alert("Cancellazione annullata con successo")
+    }
 
     updateDelType = (e) =>{
         this.setState({level: e.target.value})
@@ -344,6 +420,22 @@ class AdminAuth extends Component{
                             </p>
                         </div>
                     :
+                        (this.state.showAuth)?
+                            <div>
+                                {
+                                    this.state.adminPre.map((item, index) => {
+                                        return (
+                                            <p>
+                                                <MenuItem key={index} id={index} value={index} onClick={this.deleteAdminPre}>
+                                                    Utente: {(item.username)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {this.getTime(item)} &nbsp; Ripetizione: {item.repetition}&nbsp; Livello: {item.level}
+                                                </MenuItem>
+                                            </p>
+                                        )
+                                    })
+                                }
+                            </div>
+
+                            :
                         <p></p>
                 }
 

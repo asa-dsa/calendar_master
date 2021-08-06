@@ -46,7 +46,6 @@ class Precondition extends Component{
 
     handleShow = () =>{
         this.setState({showAuth: !this.state.showAuth})
-
     }
 
     handleAdd = () =>{
