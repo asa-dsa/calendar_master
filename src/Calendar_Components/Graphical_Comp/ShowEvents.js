@@ -27,7 +27,7 @@ class ShowEvents extends Component{
         this.deleteURL = this.props.uri + delete_uri;
         this.updateURL = this.props.uri + update_uri;
         this.value_temp = ""
-        this.disableUpdateNoOwner = !(this.state.user === this.state.event.creator)
+        this.disableUpdateNoOwner = false /*!(this.state.user === this.state.event.creator)*/
     }
 
 

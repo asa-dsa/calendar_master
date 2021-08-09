@@ -97,7 +97,7 @@ class FormClass extends Component{
             let payload = JSON.stringify(this.state, replacer)
             axios.post(this.insertURL, payload)
                 .then(response => {
-                    console.log(response.data)
+                    alert(response.data)
                 })
                 .catch(function (error) {
                     console.log(error);

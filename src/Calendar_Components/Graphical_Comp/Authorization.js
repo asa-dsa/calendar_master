@@ -10,6 +10,11 @@ const calEvent = "/calendar_event"
 const addAuth = "/ins_auth"
 const getAuth = "/list_auth"
 const removeAuth="/delete_auth"
+const getDelegateCalendar="/calendar_delegate"
+const getDelegateGroups="/groups_delegate"
+const getDelegateEvents="/events_delegate"
+const getDelegateTypes="/types_delegate"
+
 
 const authTypes = ["freeBusy", "read", "write"]
 const authSign = ["+", "-"]
@@ -25,9 +30,13 @@ class Authorization extends Component{
             events: [],
             group: [],
             auth: [],
+            del_groups: [],
+            del_types: [],
+            del_events: [],
             views: restriction[0],
             showAuth: false,
-            showAdd: false
+            showAdd: false,
+            showAddDel: false
         }
         this.getCalURL = this.props.uri + getCal_uri
         this.getTypesURL = this.props.uri + getType_uri
@@ -36,6 +45,10 @@ class Authorization extends Component{
         this.addAuthURL = this.props.uri + addAuth
         this.getAllAuthURL = this.props.uri + getAuth
         this.deleteAuthURL = this.props.uri + removeAuth
+        this.getCalDel= this.props.uri + getDelegateCalendar
+        this.getGroupDel = this.props.uri + getDelegateGroups
+        this.getEventsDelURL = this.props.uri + getDelegateEvents
+        this.getTypesDelURL = this.props.uri + getDelegateTypes
     }
 
     componentDidMount() {
@@ -43,6 +56,7 @@ class Authorization extends Component{
         this.getTypes()
         this.getGroup()
         this.getAllAuth()
+        this.getDelegateCalendars()
     }
 
     //gruppo creato dall'utente loggato al momento (id), calendar (id), typo = (any, Ti, Ei), prop (null), tipo (freeBusy, read e write) e segno
@@ -76,6 +90,18 @@ class Authorization extends Component{
     }
 
 
+    getDelegateCalendars = () =>{
+        let payload = { id: this.props.user};
+        axios.post(this.getCalDel, payload)
+            .then(response => {
+                this.setState({del_calendars: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+
     getAllAuth = () =>{
         let payload = { id: this.props.user};
         axios.post(this.getAllAuthURL, payload)
@@ -87,11 +113,44 @@ class Authorization extends Component{
             });
     }
 
+    getGroupWithDel = (data) =>{
+        let payload = {id: this.props.user, calendar_id: data};
+        axios.post(this.getGroupDel, payload)
+            .then(response => {
+                this.setState({del_groups: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
     getGroup = () =>{
         let payload = { id: this.props.user};
         axios.post(this.insertedGroup, payload)
             .then(response => {
                 this.setState({group: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    getEventsDel = () =>{
+        let payload = { id: this.props.user, calendar_id: this.state.calendar_id};
+        axios.post(this.getEventsDelURL, payload)
+            .then(response => {
+                this.setState({del_events: response.data})
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    getTypesDel = () =>{
+        let payload = { id: this.props.user, calendar_id: this.state.calendar_id};
+        axios.post(this.getTypesDelURL, payload)
+            .then(response => {
+                this.setState({del_types: response.data})
             })
             .catch(function (error) {
                 console.log(error);
@@ -121,7 +180,7 @@ class Authorization extends Component{
     }
 
     getEvents = (data) =>{
-        let payload = { calendar: data};
+        let payload = { id: this.props.user, calendar: data};
         axios.post(this.getCalEventURI, payload)
             .then(response => {
                 this.setState({events: response.data})
@@ -141,6 +200,9 @@ class Authorization extends Component{
         this.setState({showAdd: !this.state.showAdd})
     }
 
+    handleAuthDelegate = () =>{
+        this.setState({showAddDel: !this.state.showAddDel})
+    }
 
     backToCal = () =>{
         this.props.handlerViews(true)
@@ -193,6 +255,8 @@ class Authorization extends Component{
         const updateCal = (e) =>{
             let cal_id = JSON.stringify(e.target.value).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
             this.setState({calendar_id: cal_id})
+            if(this.state.showAddDel)
+                this.getGroupWithDel(cal_id)
             this.getEvents(cal_id)
         }
 
@@ -220,6 +284,11 @@ class Authorization extends Component{
 
         const updateRestr = (e) =>{
             this.setState({views: e.target.value})
+            if(e.target.value == restriction[1])
+                this.getTypesDel()
+            else if(e.target.value == restriction[2])
+                this.getEventsDel()
+
         }
 
         const updateType = (e) =>{
@@ -236,6 +305,8 @@ class Authorization extends Component{
                 <p>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi auth" onClick={this.handleAdd} />
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="submit" value="Aggiungi auth (come delegato)" onClick={this.handleAuthDelegate} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Lista auth inserite" onClick={this.handleShow} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
@@ -412,7 +483,163 @@ class Authorization extends Component{
                                 }
                             </div>
                             :
-                            <p></p>
+                            (this.state.showAddDel) ?
+                                <div>
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label>Nome del calendario</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <Select
+                                            onChange={updateCal}
+                                            defaultValue={""}
+                                        >
+                                            {
+                                                this.state.del_calendars.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index} id={index} value={item._id} onChange={updateCal}>
+                                                            {item.type}
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </p>
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label>Nome del gruppo</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <Select
+                                            onChange={updateGroup}
+                                            defaultValue={""}
+                                        >
+                                            {
+                                                this.state.del_groups.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index} id={index} value={item._id} onChange={updateGroup}>
+                                                            {item.name}
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </p>
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label>Criteri di restrizione</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <Select
+                                            onChange={updateRestr}
+                                            defaultValue={""}
+                                        >
+                                            {
+                                                restriction.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index} id={index} value={item} onChange={updateRestr}>
+                                                            {item}
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </p>
+
+                                    {
+                                        (this.state.views === restriction[1])?
+                                            <p>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <label>Tipo dell'evento</label>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <Select
+                                                    onChange={updateType}
+                                                    defaultValue={""}
+                                                >
+                                                    {
+                                                        this.state.del_types.map((item, index) => {
+                                                            return (
+                                                                <MenuItem key={index} id={index} value={item} onChange={updateType}>
+                                                                    {item}
+                                                                </MenuItem>
+                                                            )
+                                                        })
+                                                    }
+                                                </Select>
+                                            </p>
+                                            :
+                                            (this.state.views === restriction[2])?
+                                                <p>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <label>Evento</label>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <Select
+                                                        onChange={updateEvent}
+                                                        defaultValue={""}
+                                                    >
+                                                        {
+                                                            this.state.del_events.map((item, index) => {
+                                                                return (
+                                                                    <MenuItem key={index} id={index} value={item._id} onChange={updateEvent}>
+                                                                        {item.title}
+                                                                    </MenuItem>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Select>
+                                                </p>
+                                                :
+                                                <p>
+                                                </p>
+                                    }
+
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label>Visibilità dell'autorizzazione</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <Select
+                                            onChange={updateViews}
+                                            defaultValue={""}
+                                        >
+                                            {
+                                                authTypes.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index} id={index} value={item} onChange={updateViews}>
+                                                            {item}
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </p>
+
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label>Segno dell'autorizzazione</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <Select
+                                            onChange={updateSign}
+                                            defaultValue={""}
+                                        >
+                                            {
+                                                authSign.map((item, index) => {
+                                                    return (
+                                                        <MenuItem key={index} id={index} value={item} onChange={updateSign}>
+                                                            {item}
+                                                        </MenuItem>
+                                                    )
+                                                })
+                                            }
+                                        </Select>
+                                    </p>
+
+
+                                    <p>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input type="submit" value="Aggiungi auth" onClick={this.handleAddAuth} />
+                                    </p>
+
+
+                                </div>
+                                :
+                                <p/>
                 }
             </div>
         )
