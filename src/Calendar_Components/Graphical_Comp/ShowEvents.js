@@ -112,28 +112,24 @@ class ShowEvents extends Component{
         }
 
         const deleteEvent = () => {
-            if(this.state.event.creator === this.state.user) {
-                const a = JSON.stringify(this.state.event._id)
-                const user_id = a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                alert("Cancellazione dell'evento " + this.state.event.title)
+            const a = JSON.stringify(this.state.event._id)
+            const user_id = a.replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+            alert("Cancellazione dell'evento " + this.state.event.title)
 
-                let to_send = {
-                    "_id": user_id,
-                    "user": this.state.user
-                }
+            let to_send = {
+                "_id": user_id,
+                "user": this.state.user
+            }
 
-                let payload = JSON.stringify(to_send)
-                axios.post(this.deleteURL, payload)
-                    .then(response => {
-                        alert(response.data)
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            }
-            else {
-                alert("Non sei abilitato a cancellare l'evento")
-            }
+            let payload = JSON.stringify(to_send)
+            axios.post(this.deleteURL, payload)
+                .then(response => {
+                    alert(response.data)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
             backToCal()
         }
 
