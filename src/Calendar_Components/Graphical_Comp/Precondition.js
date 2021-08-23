@@ -86,35 +86,6 @@ class Precondition extends Component{
     }
 
 
-    getGroupName = (group_id) =>{
-        let name = ""
-        if(this.state.group.length){
-            this.state.group.map((item, index) => {
-                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                if(id === group_id) {
-                    console.log(item.name)
-                    name = item.name
-                }
-            })
-        }
-        return name
-    }
-
-
-    getCalName = (cal_id) =>{
-        let name = ""
-        if(this.state.calendar.length){
-            this.state.calendar.map((item, index) => {
-                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                if(id === cal_id) {
-                    console.log(item.type)
-                    name = item.type
-                }
-            })
-        }
-        return name
-    }
-
     addZero = (time) =>{
          return ((time<10?'0':'') + time).toString()
     }
@@ -431,7 +402,7 @@ class Precondition extends Component{
                                     return (
                                     <p>
                                     <MenuItem key={index} id={index} value={index} onClick={deletePre}>
-                                        Gruppo: {this.getGroupName(item.group_id)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {this.getTime(item.timeslot, item.repetition)}&nbsp; Ripetizione: {item.repetition}
+                                        Gruppo: {item.group_id}&nbsp; Calendario: {item.calendar_id}&nbsp;Timeslot: {this.getTime(item.timeslot, item.repetition)}&nbsp; Ripetizione: {item.repetition}
                                     </MenuItem>
                                     </p>
                                 )

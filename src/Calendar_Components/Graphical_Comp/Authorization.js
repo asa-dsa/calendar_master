@@ -36,7 +36,7 @@ class Authorization extends Component{
             views: restriction[0],
             showAuth: false,
             showAdd: false,
-            showAddDel: false
+            showAddDel: false,
         }
         this.getCalURL = this.props.uri + getCal_uri
         this.getTypesURL = this.props.uri + getType_uri
@@ -68,7 +68,8 @@ class Authorization extends Component{
             group_id: this.state.group_id,
             type_auth: this.state.type_auth,
             sign: this.state.sign,
-            auth: this.state.views
+            auth: this.state.views,
+            delegate: (this.state.showAddDel).toString()
         };
         let temp = {}
         if(this.state.views === restriction[0])
@@ -208,34 +209,7 @@ class Authorization extends Component{
         this.props.handlerViews(true)
     }
 
-    getGroupName = (group_id) =>{
-        let name = ""
-        if(this.state.group.length){
-            this.state.group.map((item, index) => {
-                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                if(id === group_id) {
-                    console.log(item.name)
-                    name = item.name
-                }
-            })
-        }
-        return name
-    }
 
-
-    getCalName = (cal_id) =>{
-        let name = ""
-        if(this.state.calendar.length){
-            this.state.calendar.map((item, index) => {
-                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                if(id === cal_id) {
-                    console.log(item.type)
-                    name = item.type
-                }
-            })
-        }
-        return name
-    }
 
     render(){
         const updateGroup = (e) =>{
@@ -475,7 +449,7 @@ class Authorization extends Component{
                                         return (
                                             <p>
                                                 <MenuItem key={index} id={index} value={index} onClick={deleteAuth}>
-                                                    Gruppo: {this.getGroupName(item.group_id)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Segno: {item.sign}&nbsp; Tipo auth: {item.auth}&nbsp; Condizione: {item.condition}&nbsp;Scope: {item.type_auth}
+                                                    Gruppo: {item.group_id}&nbsp; Calendario: {item.calendar_id}&nbsp;Segno: {item.sign}&nbsp; Tipo auth: {item.auth}&nbsp; Condizione: {item.condition}&nbsp;Scope: {item.type_auth}&nbsp;Inserita da delegato: {item.delegate}
                                                 </MenuItem>
                                             </p>
                                         )

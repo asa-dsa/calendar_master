@@ -49,19 +49,6 @@ class AdminAuth extends Component{
             });
     }
 
-    getCalName = (cal_id) =>{
-        let name = ""
-        if(this.state.calendar.length){
-            this.state.calendar.map((item, index) => {
-                let id = JSON.stringify(item._id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
-                if(id === cal_id) {
-                    console.log(item.type)
-                    name = item.type
-                }
-            })
-        }
-        return name
-    }
 
 
     addZero = (time) =>{
@@ -427,7 +414,7 @@ class AdminAuth extends Component{
                                         return (
                                             <p>
                                                 <MenuItem key={index} id={index} value={index} onClick={this.deleteAdminPre}>
-                                                    Utente: {(item.username)}&nbsp; Calendario: {this.getCalName(item.calendar_id)}&nbsp;Timeslot: {this.getTime(item)} &nbsp; Ripetizione: {item.repetition}&nbsp; Livello: {item.level}
+                                                    Utente: {(item.user_id)}&nbsp; Calendario: {item.calendar_id}&nbsp;Timeslot: {this.getTime(item)} &nbsp; Ripetizione: {item.repetition}&nbsp; Livello: {item.level}
                                                 </MenuItem>
                                             </p>
                                         )
