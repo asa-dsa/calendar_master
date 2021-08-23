@@ -33,6 +33,11 @@ class Header extends Component{
             });
     }
 
+    exclusive(data){
+        if (data==="false")
+            return ""
+        return "(X)"
+    }
 
     render(){
         const {posts} = this.state;
@@ -96,13 +101,14 @@ class Header extends Component{
         }
 
 
+
         return (
             <>
                 {
                     posts.map((item, index) => {
                         return(
                             <Switch key= {index} id={item.id} value={item.value} onChange={handleChange}>
-                                {item.type}
+                                {item.type} {this.exclusive(item.xor)}
                             </Switch>
                         )
                     })
