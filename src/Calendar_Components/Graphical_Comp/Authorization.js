@@ -258,9 +258,9 @@ class Authorization extends Component{
 
         const updateRestr = (e) =>{
             this.setState({views: e.target.value})
-            if(e.target.value == restriction[1])
+            if(e.target.value === restriction[1])
                 this.getTypesDel()
-            else if(e.target.value == restriction[2])
+            else if(e.target.value === restriction[2])
                 this.getEventsDel()
 
         }

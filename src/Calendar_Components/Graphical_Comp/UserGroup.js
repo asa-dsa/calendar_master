@@ -1,8 +1,9 @@
-import React, {Component, useState} from "react";
+import React, {Component} from "react";
 import axios from "axios";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import "react-tackle-box/wait";
 
 
 
@@ -11,11 +12,11 @@ const getGroup_uri = "/list_created_group"
 const insertUserGroup = "/insert_user_group"
 const image = "/image"
 const addHier = "/add_group_hier"
+const deleteUser ="/delete_user"
+const deleteHier ="/delete_user_hier"
 
 
 class UserGroup extends Component{
-
-
 
     constructor(props) {
         super(props);
@@ -32,6 +33,9 @@ class UserGroup extends Component{
         this.insertGroup = this.props.uri + insertGroup_uri;
         this.insertedGroup = this.props.uri + getGroup_uri;
         this.insertUserinGroup = this.props.uri + insertUserGroup;
+        this.deleteUserinGroup = this.props.uri + deleteUser;
+        this.deleteUserfromHier = this.props.uri + deleteHier;
+
         this.insertHier = this.props.uri + addHier
     }
 
@@ -74,7 +78,19 @@ class UserGroup extends Component{
         this.serverConn(this.insertUserinGroup, payload)
         this.setState({addUser: false})
         this.getGroup()
+    }
 
+    handleUserDel = () =>{
+        let a = JSON.stringify(this.state.group_id).replace(/['"]+/g, '').replace("{$oid:", "").replace("}", "")
+        const temp = {
+            "id": this.props.user,
+            "user": this.state.userToAdd,
+            "group": a.toString()
+        }
+        const payload = JSON.stringify(temp)
+        this.serverConn(this.deleteUserinGroup, payload)
+        this.setState({addUser: false})
+        this.getGroup()
     }
 
 
@@ -101,7 +117,6 @@ class UserGroup extends Component{
     backToCal = () =>{
         window.location.reload()
         this.props.handlerViews(true)
-
     }
 
     handleAddHier = () =>{
@@ -116,6 +131,17 @@ class UserGroup extends Component{
             let payload = JSON.stringify(temp)
             this.serverConn(this.insertHier, payload)
         }
+        this.backToCal()
+    }
+
+    handleDelHier = () =>{
+        const temp = {
+            "id": this.props.user,
+            "dad": this.state.dad,
+            "son": this.state.son
+        }
+        let payload = JSON.stringify(temp)
+        this.serverConn(this.deleteUserfromHier, payload)
         this.backToCal()
     }
 
@@ -142,9 +168,9 @@ class UserGroup extends Component{
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Aggiungi un gruppo" onClick={this.handleAddGroup} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Aggiungi utente al gruppo" onClick={this.handleAddUser} />
+                    <input type="submit" value="Aggiungi (o rimuovi) utente dal gruppo" onClick={this.handleAddUser} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="submit" value="Aggiungi gruppo dalla gerarchia" onClick={this.handleHier} />
+                    <input type="submit" value="Aggiungi (o rimuovi) gruppo dalla gerarchia" onClick={this.handleHier} />
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="submit" value="Torna indietro" onClick={this.backToCal} />
                 </p>
@@ -190,6 +216,8 @@ class UserGroup extends Component{
                                 </Select>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <input type="submit" value="Aggiungi il gruppo alla gerarchia" onClick={this.handleAddHier} />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Rimuovi il gruppo dalla gerarchia" onClick={this.handleDelHier} />
                         </p>
                         </div>
                         :
@@ -229,6 +257,8 @@ class UserGroup extends Component{
                             </p>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <input type="submit" value="Aggiungi l'utente al gruppo" onClick={this.handleUserAdd} />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="submit" value="Rimuovi l'utente dal gruppo" onClick={this.handleUserDel} />
                         </div>
                         :
                         <p>
