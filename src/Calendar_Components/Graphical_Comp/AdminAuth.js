@@ -83,11 +83,14 @@ class AdminAuth extends Component{
     }
 
     handleAdd = () =>{
-        this.setState({showAdd: !this.state.showAdd})
+        this.setState({showAdd: true})
+        this.setState({showAuth: false})
+
     }
 
     handleShow = () =>{
-        this.setState({showAuth: !this.state.showAuth})
+        this.setState({showAuth: true})
+        this.setState({showAdd: false})
     }
 
 

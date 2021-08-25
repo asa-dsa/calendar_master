@@ -193,16 +193,22 @@ class Authorization extends Component{
 
 
     handleShow = () =>{
-        this.setState({showAuth: !this.state.showAuth})
+        this.setState({showAuth: true})
+        this.setState({showAdd: false})
+        this.setState({showAddDel: false})
 
     }
 
     handleAdd = () =>{
-        this.setState({showAdd: !this.state.showAdd})
+        this.setState({showAuth: false})
+        this.setState({showAdd: true})
+        this.setState({showAddDel: false})
     }
 
     handleAuthDelegate = () =>{
-        this.setState({showAddDel: !this.state.showAddDel})
+        this.setState({showAuth: false})
+        this.setState({showAdd: false})
+        this.setState({showAddDel: true})
     }
 
     backToCal = () =>{

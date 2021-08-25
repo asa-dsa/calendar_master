@@ -45,11 +45,15 @@ class Precondition extends Component{
 
 
     handleShow = () =>{
-        this.setState({showAuth: !this.state.showAuth})
+        this.setState({showAuth: true})
+        this.setState({showAdd: false})
+
     }
 
     handleAdd = () =>{
-        this.setState({showAdd: !this.state.showAdd})
+        this.setState({showAuth: false})
+        this.setState({showAdd: true})
+
     }
 
     getGroup = () =>{
