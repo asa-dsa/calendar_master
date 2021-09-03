@@ -104,6 +104,7 @@ class Header extends Component{
 
         return (
             <>
+                <p>
                 {
                     posts.map((item, index) => {
                         return(
@@ -114,6 +115,7 @@ class Header extends Component{
                     })
                 }
                 <input type="submit" value="Aggiorna la vista" onClick={handleSend} />
+                </p>
 
                     <p align="center">
                         <input type="submit" value="Aggiungi un calendario" onClick={handleAddCal} />
@@ -128,7 +130,7 @@ class Header extends Component{
                         <input type="submit" value="Aggiungi autorizzazione" onClick={handleAddAut} />
                         &nbsp;&nbsp;&nbsp;&nbsp;
 
-                        <input type="submit" value="Aggiungi autorizzazione amministrativa" onClick={handleAdminAuth} />
+                        <input type="submit" value="Aggiungi autorizzazione amministrativa" onClick={handleAdminAuth}/>
                         &nbsp;&nbsp;&nbsp;&nbsp;
 
                     </p>

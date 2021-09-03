@@ -184,35 +184,6 @@ class ShowEvents extends Component{
                         />
                     </p>
 
-                    {/*<p>*/}
-                    {/*        (this.state.updateView || this.disableUpdateNoOwner)?*/}
-                    {/*        <TextField*/}
-                    {/*        label="Nome del calendario"*/}
-                    {/*        defaultValue={(this.state.event.calendar)}*/}
-                    {/*        disabled={this.disableUpdateNoOwner}*/}
-                    {/*        />*/}
-                    {/*    :*/}
-                    {/*        <p>*/}
-                    {/*            <label>Nome del calendario </label>*/}
-                    {/*            &nbsp;&nbsp;&nbsp;&nbsp;*/}
-                    {/*            <Select*/}
-                    {/*                onChange={updateCal}*/}
-                    {/*                defaultValue={(this.state.event.calendar)}*/}
-                    {/*            >*/}
-                    {/*                {*/}
-                    {/*                    calendar_names.map((item, index) => {*/}
-                    {/*                        return (*/}
-                    {/*                            <MenuItem key={index} id={item.id} value={item.id} onChange={updateCal}>*/}
-                    {/*                                {item.type}*/}
-                    {/*                            </MenuItem>*/}
-                    {/*                        )*/}
-                    {/*                    })*/}
-                    {/*                }*/}
-                    {/*            </Select>*/}
-                    {/*        </p>*/}
-                    {/*    }*/}
-                    {/*</p>*/}
-
                     <p>
                         <TextField
                             label="Tipo dell'evento"

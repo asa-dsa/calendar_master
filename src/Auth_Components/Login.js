@@ -100,7 +100,7 @@ export class Login extends React.Component {
                             <Redirect to="/register" />
                             :
                             <button type="submit" className="btn btn-primary btn-block" onClick={handleRegister}>Registrati</button>
-                        }                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        }    &nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
 
                     </form>
