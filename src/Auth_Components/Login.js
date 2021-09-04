@@ -84,7 +84,7 @@ export class Login extends React.Component {
                         <h3>Accesso</h3>
                         <div className="form-group">
                             <label>Username</label>
-                            <input type="email" className="form-control" onChange={setName} placeholder="Inserisci indirizzo email" />
+                            <input type="email" className="form-control" onChange={setName} placeholder="Inserisci il nickname" />
                         </div>
 
                         <div className="form-group">

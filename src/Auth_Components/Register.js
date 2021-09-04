@@ -68,7 +68,7 @@ export class Register extends React.Component {
 
                     <div className="form-group">
                         <label>Username</label>
-                        <input type="email" className="form-control" placeholder="Inserisci indirizzo email" onChange={setMail} />
+                        <input type="email" className="form-control" placeholder="Inserisci il nickname" onChange={setMail} />
                     </div>
 
                     <div className="form-group">
